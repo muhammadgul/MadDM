@@ -19,8 +19,8 @@ install maddm
 # run maddm
 ./bin/maddm.py
 # example run:
-import model DMsimp_s_spin0_MD
-define darkmatter ~xd
+'import model DMsimp_s_spin0_MD'
+'define darkmatter ~xd'
 generate relic_density
 add direct_detection
 add indirect_detection
