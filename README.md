@@ -1,6 +1,6 @@
 # MadDM
 ## install madgraph first but check the latest version first
- here are some important tips:https://github.com/IPNL-CMS/HTTMadgraphDocumentation
+ [Here] (https://github.com/IPNL-CMS/HTTMadgraphDocumentation) are some important tips.
 
 ######install madgraph from browser or from command line
  from browser: http://madgraph.phys.ucl.ac.be/
