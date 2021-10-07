@@ -12,7 +12,7 @@ rm MG5_aMC_v2.6.4.tar.gz
 ## MadDM installation
 ###### Install the related [software](http://johannesbuchner.github.io/PyMultiNest/install.html) before installation of MadDM
 ###### Using [paper](https://arxiv.org/pdf/1804.00044.pdf) to install maddm
-###### Include LD_LIBRARY_PATH in **.bashrc** so that it will automatically included when open a new terminal
+###### Include LD_LIBRARY_PATH in *.bashrc* so that it will automatically included when open a new terminal
 ```export LD_LIBRARY_PATH=$PWD/MultiNest/lib:$PWD/cuba/directory/:$LD_LIBRARY_PATH```
 ###### Installing
 ```
