@@ -1,12 +1,12 @@
 # MadDM
-# install madgraph first but check the latest version first
-# here are some important tips:https://github.com/IPNL-CMS/HTTMadgraphDocumentation
+## install madgraph first but check the latest version first
+ here are some important tips:https://github.com/IPNL-CMS/HTTMadgraphDocumentation
 
-#install madgraph from browser or from command line
-# from browser: http://madgraph.phys.ucl.ac.be/
-wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.6.4.tar.gz
-tar xf MG5_aMC_v2.6.4.tar.gz
-rm MG5_aMC_v2.6.4.tar.gz
+######install madgraph from browser or from command line
+ from browser: http://madgraph.phys.ucl.ac.be/
+`wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.6.4.tar.gz`
+`tar xf MG5_aMC_v2.6.4.tar.gz`
+`rm MG5_aMC_v2.6.4.tar.gz`
 # using paper below, install maddm
 # https://arxiv.org/pdf/1804.00044.pdf
 # install the related software before installing
