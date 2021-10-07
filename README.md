@@ -2,19 +2,19 @@
 ## install madgraph first but check the latest version first
  [Here](https://github.com/IPNL-CMS/HTTMadgraphDocumentation) are some important tips.
 
-###### Install madgraph from browser or from command line
- from browser: http://madgraph.phys.ucl.ac.be/
+###### Install madgraph from browser, 
+[Download](http://madgraph.phys.ucl.ac.be/) from browser.
+###### Or from command line
 ```
 wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.6.4.tar.gz
 tar xf MG5_aMC_v2.6.4.tar.gz
 rm MG5_aMC_v2.6.4.tar.gz
 ```
-# using paper below, install maddm
-# https://arxiv.org/pdf/1804.00044.pdf
-# install the related software before installing
-# http://johannesbuchner.github.io/PyMultiNest/install.html
-# include LD_LIBRARY_PATH in .bashrc so that it will automatically included when open a new terminal
-export LD_LIBRARY_PATH=$PWD/MultiNest/lib:$PWD/cuba/directory/:$LD_LIBRARY_PATH
+## MadDM installation
+###### Using [paper](https://arxiv.org/pdf/1804.00044.pdf) to install maddm
+###### Install the related [software](http://johannesbuchner.github.io/PyMultiNest/install.html) before installation of MadDM
+###### Include LD_LIBRARY_PATH in **.bashrc** so that it will automatically included when open a new terminal
+```export LD_LIBRARY_PATH=$PWD/MultiNest/lib:$PWD/cuba/directory/:$LD_LIBRARY_PATH```
 ./bin/mg5_aMC
 install maddm
 
