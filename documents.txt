@@ -26,6 +26,8 @@ Experiment papers.
 
 ATLAS/CMS report.
 1): https://arxiv.org/pdf/1507.00966.pdf
+2): https://www.sciencedirect.com/science/article/pii/S2212686419301633?via%3Dihub
+
 
 
 Thesis.
