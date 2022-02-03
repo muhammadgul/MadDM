@@ -1,7 +1,34 @@
+mkdir madgraph
+
+Install MadGraph with latest version:
+
+wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.6.4.tar.gz
+tar xf MG5_aMC_v2.6.4.tar.gz
+rm MG5_aMC_v2.6.4.tar.gz
+
 Download models from (download the whole repo as you like and copy models in the Madgraph models dir):
 https://github.com/LHC-DMWG/model-repository/tree/DMSimp_t
-User the PDF set: NNPDF31_lo_as_0118 and nlo, nnlo
-download here:https://lhapdf.hepforge.org/downloads?f=pdfsets/v6.backup/current
+Use the PDF set: NNPDF31_lo_as_0118 and nlo, nnlo
+download from here:https://lhapdf.hepforge.org/downloads?f=pdfsets/v6.backup/current
+Can use the script, but change the version and name of pdfsets:
+
+https://github.com/muhammadgul/schools/blob/master/install_PDF_set.sh
+
+Update the python3.8 dependency, see the question https://answers.launchpad.net/mg5amcnlo/+question/700490
+sudo apt update
+sudo apt install python3.8-dev
+
+Run MGraph:
+python3.8 ./bin/mg5_aMC
+
+Install LHAPDF:
+install lhapdf6
+
+include path to the library path from the path/to/HEPTools/lhapdf6_py3/
+export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
+
+Now run MGraph:
+
 python3.8 ./bin/mg5_aMC
 import model Pseudoscalar_2HDM
 generate p p > h1 xd xd~
@@ -10,3 +37,7 @@ exit
 Generate events:
 cd template_pp_h1_xdxd
 python3.8 ./bin/madevent
+
+Change run_card.dat for lhapdf
+nnlo... --> lhapdf
+315000 for lhaid
