@@ -22,7 +22,7 @@ Update the python3.8 dependency, see the question https://answers.launchpad.net/
 Run MGraph:
 >> python3.8 ./bin/mg5_aMC
 
->> Install LHAPDF:
+Install LHAPDF:
 >> install lhapdf6
 
 include path to the library path from the path/to/HEPTools/lhapdf6_py3/
@@ -37,6 +37,14 @@ For gluon-gluon fusion:
 >> generate g g > h1 xd xd~ [noborn=QCD]
 >> display diagrams (optional for diagrams checking)
 >> output template_gg_h1_xdxd
+
+Some packages will be installed, if it give "output template_gg_h1_xdxd", mail to the developer:
+1. cuttools  (OPP) [0711.3596]   : will be installed (required)
+2. iregi     (TIR) [1405.0301]   : will be installed (required)
+3. ninja     (OPP) [1403.1229]   : will be installed (recommended)
+4. collier   (TIR) [1604.06792]  : will be installed (recommended)
+5. golem     (TIR) [0807.0605]   : do not install
+
 >> exit
 Generate events:
 >> cd template_pp_h1_xdxd
