@@ -1,5 +1,7 @@
+# MadGraph for Dark Matter
+```
 mkdir madgraph
-
+```
 Install MadGraph with latest version (check it, i am using MG5_aMC_v3.2.0):
 
 wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v(check latest version).tar.gz
