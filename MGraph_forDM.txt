@@ -1,8 +1,8 @@
 mkdir madgraph
 
-Install MadGraph with latest version:
+Install MadGraph with latest version (check it):
 
-wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.6.4.tar.gz
+wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v2.(check latest version).tar.gz
 tar xf MG5_aMC_v2.6.4.tar.gz
 rm MG5_aMC_v2.6.4.tar.gz
 
@@ -28,11 +28,14 @@ include path to the library path from the path/to/HEPTools/lhapdf6_py3/
 export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH
 
 Now run MGraph:
+For mono-higgs signature:
 
 python3.8 ./bin/mg5_aMC
+For gluon-gluon fusion:
 import model Pseudoscalar_2HDM
-generate p p > h1 xd xd~
-output template_pp_h1_xdxd
+generate g g > h1 xd xd~ [noborn=QCD]
+display diagrams (optional for diagrams checking)
+output template_gg_h1_xdxd
 exit
 Generate events:
 cd template_pp_h1_xdxd
@@ -41,3 +44,9 @@ python3.8 ./bin/madevent
 Change run_card.dat for lhapdf
 nnlo... --> lhapdf
 315000 for lhaid
+
+for bottom-bottom~ fusion:
+import model Pseudoscalar_2HDM-bbMET_5FS
+generate p p > h1 xd xd~
+output template_pp_h1_xdxd
+exit
