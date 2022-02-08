@@ -60,7 +60,7 @@ nnlo... --> lhapdf
 
 for bottom-bottom~ fusion:
 >> import model Pseudoscalar_2HDM-bbMET_5FS
->> generate p p > h1 xd xd~
+>> generate p p > h1 xd xd~, h1 > b b~
 >> output template_pp_h1_xdxd
 >> exit
 
