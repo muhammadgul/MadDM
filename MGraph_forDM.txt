@@ -16,6 +16,8 @@ Can use the script, but change the version and name of pdfsets:
 
 https://github.com/muhammadgul/schools/blob/master/install_PDF_set.sh
 
+[for lxplus at CERN use it. 
+source /cvmfs/sft.cern.ch/lcg/releases/LCG_98python3/Python/3.7.6/x86_64-centos7-gcc10-opt/Python-env.sh]
 
 Update the python3.8 dependency, see the question https://answers.launchpad.net/mg5amcnlo/+question/700490
 >> sudo apt update
@@ -61,3 +63,6 @@ for bottom-bottom~ fusion:
 >> generate p p > h1 xd xd~
 >> output template_pp_h1_xdxd
 >> exit
+
+Note: if you see a python with PDF issue like: Failed to access python version of LHAPDF: ... 
+then, include in .bashrc file, export LD_LIBRARY_PATH=/path/to/MG5_aMC_v3_2_0/HEPTools/lhapdf6_py3/lib:$LD_LIBRARY_PATH 
