@@ -3,9 +3,9 @@
 
 Install MadGraph with latest version (check it, i am using MG5_aMC_v3.2.0):
 
->> wget http://madgraph.physics.illinois.edu/Downloads/MG5_aMC_v(check latest version).tar.gz
->> tar xf MG5_aMC_v2.6.4.tar.gz
->> rm MG5_aMC_v2.6.4.tar.gz
+>> wget https://launchpad.net/mg5amcnlo/3.0/3.3.x/+download/MG5_aMC_v3.3.1.tar.gz
+>> tar xf MG5_aMC_v3.3.1.tar.gz
+>> rm MG5_aMC_v3.3.1.tar.gz
 
 Download models from (download the whole repo as you like and copy models in the Madgraph models dir):
 https://github.com/LHC-DMWG/model-repository/tree/DMSimp_t
