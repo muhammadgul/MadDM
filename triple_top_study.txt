@@ -1,0 +1,14 @@
+download model TopFCNC_UFO: https://cms-project-generators.web.cern.ch/cms-project-generators/
+Run madGraph: ./bin/mg5_aMC
+import model: > import modle TopFCNC_UFO
+generate process: > generate p p > t t t~ , (t > w+ b, w+ > l+ vl), (t > w+ b, w+ > l+ vl), (t~ > w- b~, w- > j j)
+stope output: > output ttt_template
+> exit
+cd ttt_template
+./bin/generate_events
+> enter or make changes accordingly
+> unweighted_events.lhe file will be made in the Events/run directory
+> To analyze this .lhe file, use lhe_reader_non_decayed.c from the github below.
+> https://github.com/muhammadgul/general_scripts.git
+> This file is initially set for H--> t t~ . To make analyzer set for ttt~ another
+top quark must be included but this top quark must be different from the previous one.
