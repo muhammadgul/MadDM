@@ -10,6 +10,10 @@ Install MadGraph with latest version (check it, i am using MG5_aMC_v3.2.0):
 Download models from (download the whole repo as you like and copy models in the Madgraph models dir):
 https://github.com/LHC-DMWG/model-repository/tree/DMSimp_t
 >> git clone https://github.com/LHC-DMWG/model-repository.git
+
+>> Model explanation can be found here:
+https://github.com/LHC-DMWG/model-repository/blob/DMSimp_t/models/Pseudoscalar_2HDM/README.txt
+
 Use the PDF set: NNPDF31_lo_as_0118 and nlo, nnlo
 download from here:https://lhapdf.hepforge.org/downloads?f=pdfsets/v6.backup/current
 Can use the script, but change the version and name of pdfsets:
