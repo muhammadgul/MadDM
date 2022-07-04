@@ -46,6 +46,10 @@ https://github.com/LHC-DMWG/model-repository/blob/master/models/Pseudoscalar_2HD
 For gluon-gluon fusion:
 >> import model Pseudoscalar_2HDM
 >> generate g g > h1 xd xd~ [noborn=QCD]
+
+{ if you want to exclude a particle like z from the mediator
+>>generate g g > h1 xd xd~ /z [noborn=QCD]}
+
 >> display diagrams (optional for diagrams checking)
 >> output template_gg_h1_xdxd
 
