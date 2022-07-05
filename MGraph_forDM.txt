@@ -67,7 +67,7 @@ Generate events:
 >> launch
 For decaying the SM higgs h1 (h1 > b b~), then after launch command
 madSping = ON
-Inside the madsping card:
+In the madspin_card.dat:
 set spinmode = none
 
 Change run_card.dat for lhapdf
