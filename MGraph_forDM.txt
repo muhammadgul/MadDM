@@ -49,10 +49,6 @@ For gluon-gluon fusion:
 
 { if you want to exclude a particle like z from the mediator
 >>generate g g > h1 xd xd~ /z [noborn=QCD]}
-For decaying the SM higgs h1 (h1 > b b~), then after launch command
-madSping = ON
-Inside the madsping card:
-set spinmode = none
 
 >> display diagrams (optional for diagrams checking)
 >> output template_gg_h1_xdxd
@@ -68,6 +64,11 @@ Some packages will be installed, if it give "output template_gg_h1_xdxd", mail t
 Generate events:
 >> cd template_gg_h1_xdxd
 >> python3.8 ./bin/madevent
+>> launch
+For decaying the SM higgs h1 (h1 > b b~), then after launch command
+madSping = ON
+Inside the madsping card:
+set spinmode = none
 
 Change run_card.dat for lhapdf
 nnlo... --> lhapdf
