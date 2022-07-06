@@ -1,0 +1,5 @@
+wget https://www.hepforge.org/archive/2hdmc/2HDMC-1.8.0.tar.gz
+tar -zxvf 2HDMC-1.8.0.tar.gz
+cd 2HDMC-1.8.0
+make
+make lib
