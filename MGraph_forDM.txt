@@ -3,13 +3,14 @@
 
 Install MadGraph with latest version (check it, i am using MG5_aMC_v3.2.0):
 
->> wget https://launchpad.net/mg5amcnlo/3.0/3.3.x/+download/MG5_aMC_v3.3.1.tar.gz
->> tar xf MG5_aMC_v3.3.1.tar.gz
->> rm MG5_aMC_v3.3.1.tar.gz
+>> wget launchpad.net/madgraph5/3.0/3.4.x/+download/MG5_aMC_v3.4.0.tar.gz
+>> tar xf MG5_aMC_v3.4.0.tar.gz
+>> rm MG5_aMC_v3.4.0.tar.gz
 
 Download models from (download the whole repo as you like and copy models in the Madgraph models dir):
 https://github.com/LHC-DMWG/model-repository/tree/DMSimp_t
 >> git clone https://github.com/LHC-DMWG/model-repository.git
+copy Pseudoscalar_2HDM from model-repository/models to MG5_aMC_v3_4_0/models directory.
 
 >> Model explanation can be found here:
 https://github.com/LHC-DMWG/model-repository/blob/DMSimp_t/models/Pseudoscalar_2HDM/README.txt
@@ -38,9 +39,6 @@ include path to the library path from the path/to/HEPTools/lhapdf6_py3/
 
 Now run MGraph:
 For mono-higgs signature:
-
-Model Pseudoscalar_2HDM information is here:
-https://github.com/LHC-DMWG/model-repository/blob/master/models/Pseudoscalar_2HDM/README.txt
 
 >> python3.8 ./bin/mg5_aMC
 For gluon-gluon fusion:
