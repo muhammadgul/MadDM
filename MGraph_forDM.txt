@@ -59,6 +59,19 @@ Some packages will be installed, if it give "output template_gg_h1_xdxd", mail t
 5. golem     (TIR) [0807.0605]   : do not install
 
 >> exit
+Now in the directory produced, template_gg_h1_xdxd:
+In the Card/ directory change pdfsets in the run_card.dat
+     lhapdf    = pdlabel     ! PDF set
+     263000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
+The number 26300 corresponds to NNPDF30_lo_as_0130 which can be found in MadGraph directory
+HEPTools/lhapdf6_py3/share/LHAPDF/pdfsets.index
+
+In the Card/ derectory chage the parameters in the param_card.dat
+tan(beta), sin(bma), masses of the mediators, dark matter candidates, decay widths of the mediator to Auto
+like: DECAY 35 auto
+Decay width of the SM like higgs set to: DECAY 25 4.070000e-03 as MadGraph can't calculate automatically to a good precision.
+
+
 Generate events:
 >> cd template_gg_h1_xdxd
 >> python3.8 ./bin/madevent
