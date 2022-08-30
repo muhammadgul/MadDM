@@ -1,0 +1,2 @@
+To install the Delphes follow the instructions on page below.
+https://cp3.irmp.ucl.ac.be/projects/delphes/wiki/WorkBook/QuickTour
