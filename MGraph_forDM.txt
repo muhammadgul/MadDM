@@ -94,5 +94,17 @@ for bottom-bottom~ fusion:
 Note: if you see a python with PDF issue like: Failed to access python version of LHAPDF: ... 
 then, include in .bashrc file, export LD_LIBRARY_PATH=/path/to/MG5_aMC_v3_2_0/HEPTools/lhapdf6_py3/lib:$LD_LIBRARY_PATH 
 
+#############  ---- Possible error-----------#######################
+For Delphes installation, when source:
+source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
+
+It gives error in madgraph event generation as:
+Error detected in "generate_events run_04"
+write debug file /afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_4_0/template_pp_tt_test/run_04_tag_1_debug.log
+If you need help with this issue please contact us on https://answers.launchpad.net/mg5amcnlo
+str : Histogram with run_id '0' was not found in the specified XML source.
+
+
+
 ##############################process generation #####################################
 generate p p > t t~ , (t > w+ b, w+ > l+ vl), (t~ > w- b~, w- > l- vl~)
