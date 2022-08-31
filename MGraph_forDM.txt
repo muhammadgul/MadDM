@@ -93,3 +93,6 @@ for bottom-bottom~ fusion:
 
 Note: if you see a python with PDF issue like: Failed to access python version of LHAPDF: ... 
 then, include in .bashrc file, export LD_LIBRARY_PATH=/path/to/MG5_aMC_v3_2_0/HEPTools/lhapdf6_py3/lib:$LD_LIBRARY_PATH 
+
+##############################process generation #####################################
+generate p p > t t~ , (t > w+ b, w+ > l+ vl), (t~ > w- b~, w- > l- vl~)
