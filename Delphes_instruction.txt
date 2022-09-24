@@ -1,2 +1,7 @@
 To install the Delphes follow the instructions on page below.
 https://cp3.irmp.ucl.ac.be/projects/delphes/wiki/WorkBook/QuickTour
+
+While running delphes, solution for the following error is:
+Error in cling::AutoLoadingVisitor::InsertIntoAutoLoadingState:
+   Missing FileEntry for modules/ClusterCounting.h
+ >> export ROOT_INCLUDE_PATH=/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_4_0/Delphes/
