@@ -1,3 +1,60 @@
+#A very good talk.
+#http://www.pd.infn.it/~lacaprar/talks/2HDM_20141216_status_of_2HDM_grids_and_2HDM_interpratation_in_AtoZhtoellellbb_analysis.pdf
+#install 2HDMC https://arxiv.org/pdf/0902.0851.pdf
+wget https://www.hepforge.org/archive/2hdmc/2HDMC-1.7.0.tar.gz
+tar -zxvf 2HDMC-1.7.0.tar.gz
+cd 2HDMC-1.7.0
+make
+make lib
+cd ..
+#install LHAPDF
+#for LHAPDF-6.1.6 note about the boost version.
+#use this one ./configure --prefix=$PWD/../lhapdf_inst --with-boost=/afs/cern.ch/sw/lcg/external/Boost/1.53.0_python2.4/x86_64-slc5-gcc41-opt
+echo "Downloading and installing lhapdf"
+wget https://www.hepforge.org/archive/lhapdf/LHAPDF-6.2.0.tar.gz
+tar -zxvf LHAPDF-6.2.0.tar.gz
+mkdir lhapdf_inst
+cd LHAPDF-6.2.0
+#https://lhapdf.hepforge.org/install.html
+source /cvmfs/sft.cern.ch/lcg/releases/LCG_87/gcc/4.9.3/x86_64-slc6/setup.sh
+source /cvmfs/sft.cern.ch/lcg/releases/LCG_87/Python/2.7.10/x86_64-slc6-gcc49-opt/Python-env.sh
+#sometimes ./configure doesn't work then execute the following command
+autoreconf -f -i
+./configure --prefix=$PWD/../lhapdf_inst
+make -j2 && make install
+cd ..
+## Set environment variables
+export PATH=$PWD/lhapdf_inst/bin:$PATH
+export PDFSETS_PATH=$PWD/lhapdf_inst/share/LHAPDF:$PDFSETS_PATH
+export LD_LIBRARY_PATH=$PWD/lhapdf_inst/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$PWD/lhapdf_inst/lib64/python2.6/site-packages:$PYTHONPATH
+## Test the scripts
+#lhapdf-config --help
+#lhapdf list
+echo "Downloding lhapdf sets"
+cd $PWD/lhapdf_inst/share/LHAPDF
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_lo_as_0118.tar.gz
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_nlo_as_0118.tar.gz
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_nnlo_as_0118.tar.gz
+for file in *.tar.gz; do tar -zxf $file; done
+rm *.tar.*
+cd -
+#download SusHi
+echo "Download and install SusHi"
+wget https://www.hepforge.org/archive/sushi/SusHi-1.6.1.tar.gz
+tar -zxvf SusHi-1.6.1.tar.gz
+cd SusHi-1.6.1/
+sed -i "s/1.6.3/1.7.0/g" Makefile
+sed -i "s/LHAPATH =/LHAPATH = ..\/lhapdf_inst\/lib/g" Makefile
+./configure
+make predef=2HDMC
+#cd .. && rm *.tar.*
+
+#fter compilation, one may perform a test run of SusHi by copying one of the input files from the example
+#- to the bin -folder, change to the bin -folder, and run 
+##./sushi sushi.in sushi.out
+
+####################### try this latest version #######################################
 wget https://www.hepforge.org/archive/2hdmc/2HDMC-1.8.0.tar.gz
 tar -zxvf 2HDMC-1.8.0.tar.gz
 cd 2HDMC-1.8.0
