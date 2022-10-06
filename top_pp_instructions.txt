@@ -1,0 +1,38 @@
+wget http://www.hepforge.org/archive/lhapdf/LHAPDF-6.1.6.tar.gz -O- | tar xz
+cd LHAPDF-6.1.6
+./configure --prefix=$PWD/../top_pp
+make -j2 && make install
+cd ..
+cd top_pp/share/LHAPDF
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_lo_as_0118.tar.gz -O- | tar xz
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_nlo_as_0118.tar.gz -O- | tar xz
+wget https://www.hepforge.org/archive/lhapdf/pdfsets/6.1.6/NNPDF30_nnlo_as_0118.tar.gz -O- | tar xz
+
+# Set environment variables
+export PATH=$PWD/local/bin:$PATH
+export LD_LIBRARY_PATH=$PWD/local/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$PWD/local/lib64/python2.6/site-packages:$PYTHONPATH
+
+# Test the scripts
+lhapdf-config --help
+lhapdf list
+
+# Download top++
+wget http://www.alexandermitov.com/images/stories/Alexander/files/top++2.0.tar.gz -O- | tar xz
+cd top++2.0
+
+# edit Makefile
+sed -i "s/CXX = g++/CXX = \/usr\/bin\/g++/g" Makefile
+sed -i "s/GSLDIR = $(shell gsl-config --prefix)/GSLDIR = \/usr/top_pp/g" Makefile
+sed -i "s/LHADIR = $(shell lhapdf-config --prefix)/LHADIR = \/afs\/cern.ch\/work\/m\/mgul\/public\/generators/\/LHAPDF-6.1.6\/..\/top_pp/g" Makefile
+
+# compile the code
+make
+cp top++.cfg top++.cfg_original
+
+# test one example code
+cp  examples-2.0/Specific_Examples/Ex4_top++NNLO-LHC14.cfg top++.cfg
+pico top++.cfg
+#=====> Change "ECMLHC 14000" to "ECMLHC 13000"
+./top++
+
