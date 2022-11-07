@@ -1,0 +1,10 @@
+Download UFO files for MadGraph from here:
+https://github.com/ymzhong/vector_leptoquark
+Here are two types of models: scalar LQ and vector LQ
+>> git clone https://github.com/ymzhong/vector_leptoquark.git
+Copy both models in MadGraph models directory
+>> cp -r vector_leptoquark/sleptoquark_UE_UFO MG5_aMC_v3_4_0/models/
+>> cp -r vector_leptoquark/vleptoquark_QL_triplet_UFO MG5_aMC_v3_4_0/models/
+g g > s1 s1~, s1 > l+ q, s1~ > l- q-
+define  q = u c t d s b
+generate g g > s1 s1~, (s1 > l- q), (s1~ > l+ q~)
