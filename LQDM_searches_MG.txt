@@ -1,0 +1,8 @@
+Download UFO files for MadGraph from here:
+https://feynrules.irmp.ucl.ac.be/attachment/wiki/LQDM/LQDM_UFO.tar.gz
+>> unzip LQDM_UFO.tar.gz
+Copy model in MadGraph models directory
+>> ./bin/mg_aMC
+>> import model LQDM_UFO
+>> generate g g > ~chi0 mu+ c ~chi0 mu- c~
+
