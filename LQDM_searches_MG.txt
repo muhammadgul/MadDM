@@ -4,6 +4,8 @@ https://feynrules.irmp.ucl.ac.be/attachment/wiki/LQDM/LQDM_UFO.tar.gz
 Copy model in MadGraph models directory
 >> ./bin/mg_aMC
 >> import model LQDM_UFO
+>> generate p p > ~chi0 q~ l- ~chi0 q l+
+(Note: this command will generate about 7k process. For small checks use the following command)
 >> generate g g > ~chi0 mu+ c ~chi0 mu- c~
 >> output template_LQDM_v0
 >> launch template_LQDM_v0
