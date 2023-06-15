@@ -108,3 +108,38 @@ str : Histogram with run_id '0' was not found in the specified XML source.
 
 ##############################process generation #####################################
 generate p p > t t~ , (t > w+ b, w+ > l+ vl), (t~ > w- b~, w- > l- vl~)
+
+#####################################################################################
+
+Madgraph issues and it's solution
+
+Issue #1:
+
+{Command "launch " interrupted with error:
+MadGraph5Error : Histogram with run_id '0' was not found in the specified XML source.
+Please report this bug on https://bugs.launchpad.net/mg5amcnlo
+More information is found in '/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_5_0/template_pp_tt_bbll/run_05_tag_1_debug.log'.
+Please attach this file to your report.
+}
+
+Reason:
+There was another pythia version installed on the system, and by default madgraph points to that one.
+Solution:
+{
+export PYTHIA8DATA=/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_5_0/HEPTools/pythia8/share/Pythia8/xmldoc
+-------------------------------------------------------
+
+Issue #2:
+{
+Command "launch " interrupted with error:
+RuntimeError : Could not find a pdfsets.index file
+Please report this bug on https://bugs.launchpad.net/mg5amcnlo
+More information is found in '/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_5_0/template_pp_tt_bbll/run_04_tag_1_debug.log'.
+Please attach this file to your report.
+}
+
+Solution:
+{
+export LD_LIBRARY_PATH=/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_5_0/HEPTools/lhapdf6_py3/lib:$LD_LIBRARY_PATH
+} 
+-------------------------------------------------------------
