@@ -1,0 +1,671 @@
+//&>/dev/null;x="${0%.*}";[ ! "$x" -ot "$0" ]||(rm -f "$x";g++ -o "$x" "$0" -I`root-config --incdir` `root-config --libs`);exit
+// sure to use root6
+// Build: g++ lhe_reader_non_decayed.c -o lhe_reader_non_decayed -I`root-config --incdir` `root-config --libs`
+// OR, g++ -std=c++11 lhe_reader_non_decayed.c -o lhe_reader_non_decayed -I`root-config --incdir` `root-config --libs`
+// The above line will produce executable file name lhe_reader_non_decayed
+// ./lhe_reader_non_decayed unweighted_events
+
+#include <cmath>
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TFile.h>
+//#include </home/muhammad/root6/build/include/TLorentzVector.h>
+#include <TLorentzVector.h>
+#include "TCanvas.h"
+using namespace std;
+
+// Pour une description du format leshouches
+// hep-ph/0609017
+//
+// pour chaque evenement
+// une ligne générale : NbPart idprocess poids scale alpha_em alpha_s
+// pour chaque particule : id status mere1 mere2 couleur1 couleur2 px py pz E m lifetime spin  
+int main(int argc, char **argv) {
+
+  if (argc != 2) {
+    cout << "Missing argument. Expected LHE filename without '.lhe'"<< endl;
+    exit(-5);
+  }
+  float DeltaR(float eta1, float eta2, float phi1, float phi2);
+  float DeltaPhi(float phi1, float phi2);
+
+  string basename=argv[1];
+
+  string lhefname = basename+".lhe";
+  string rootfname = basename+".root";
+
+  string tt;
+  int event=0;
+  int npart,idprocess;
+  double weight,scale,alpha_em,alpha_s;
+
+  TH1::SetDefaultSumw2(true);
+// --- insert here histogram definition
+  TH1F* hdphi_gj_gl  = new TH1F("dphi_gj_gl","dphi_gj_gl",50,-3.5,3.5) ;
+  TH1F* hDPhi_tbarLep_topbJet = new TH1F("dphi_tbarlep_topbJet","dphi tbarlep topbJet",50,-3.5,3.5) ;
+  TH1F* hDPhi_topLep_tbarbJet = new TH1F("dphi_topLep_tbarbJet","dphi topLep tbarbJet",50,-3.5,3.5) ;
+  TH1F* hDPhi_Jets_Lep  = new TH1F("dPhi_Jets_Lep","dPhi Jets Lep",50,-3.5,3.5) ;
+  TH1F* hDPhi_bJets_lJets  = new TH1F("DPhi_bJets_lJets","DPhi bJets lJets",50,-3.5,3.5) ;
+  TH1F* hDPhi_topLep_tbarJet  = new TH1F("dPhi_topLep_tbarJet","dPhi topLep tbarJet",50,-3.5,3.5) ;
+  TH1F* hDPhi_bJets_bbar  = new TH1F("hDPhi_bJets_bbar","hDPhi bJets bbar",50,-3.5,3.5) ;
+  TH1F* hdR_bjet_bbar  = new TH1F("dR_bjet_bbar","dR_bjet_bbar",50,-2.0,10.0) ;
+  TH1F* hdR_ljets_lep  = new TH1F("dR_gen_ljets_lep","dR gen ljets lep",50,-2.0,10.0) ;
+  TH1F* hdR_b_lep   = new TH1F("dR_gen_b_lep","dR_gen b lep",50,-2.0,10.0) ;
+
+  TH1F* hDPhi_nu_jets = new TH1F("dphi_nu_jets","dphi nu jets",50,-3.5,3.5) ;
+  TH1F* hgen_met_pt = new TH1F("MET","MET",50,0,200) ;
+  TH1F* hMtt = new TH1F("mtt","tt invariant mass",50,250,900) ;
+  TH1F* hPt_ttbar = new TH1F("pt_ttbar","Pt ttbar",50,0,500) ;
+  TH1F* hdphi_ttbar = new TH1F("dphi_ttbar","dphi ttbar",50,0,10) ;
+  TH1F* hBoost_ttbar = new TH1F("boost_ttbar","Boost ttbar",50,-0.2,1.2);
+  TH1F* hPt_top = new TH1F("top_pt","top pt",50,0.0,400) ;
+  TH1F* hEta_top = new TH1F("top_eta","top eta",50,-6,6) ;
+  TH1F* hPhi_top = new TH1F("top_phi","top phi",50,-3.16,3.16) ;
+  TH1F* hPx_top = new TH1F("top_px","top px",50,-200,200) ;
+  TH1F* hPy_top = new TH1F("top_py","top py",50,-200,200) ;
+  TH2F* hPx_top_tbar = new TH2F("top_tbar_px","top_tbar px",50,-50,50,50,-50,50) ;
+  TH2F* hPy_top_tbar = new TH2F("top_tbar_py","top_tbar py",50,-50,50,50,-50,50) ;
+  TH1F* hPt_tbar = new TH1F("tbar_pt","tbar pt",50,-10,450) ;
+  TH1F* hEta_tbar = new TH1F("tbar_eta","tbar eta",50,-6,6) ;
+  TH1F* hPhi_tbar = new TH1F("tbar_phi","tbar phi",50,-3.16,3.16) ;
+  TH1F* hPx_tbar = new TH1F("tbar_px","tbar px",50,-200,200) ;
+  TH1F* hPy_tbar = new TH1F("tbar_py","tbar py",50,-200,200) ;
+  TH1F* hNextrajets = new TH1F("njets","n extra jets",50,0,4);
+  TH1F* hextrajet_flavour = new TH1F("jet_flavour","extra jets flavour",50,-5,26);
+  TH1F* hPt_extrajet = new TH1F("extrajet_pt","extra jets pt",50,0,200) ;
+  TH1F* hEta_extrajet = new TH1F("extrajet_eta","extra jets eta",50,-5,5) ;
+  TH1F* hPhi_extrajet = new TH1F("extrajet_phi","extra jets phi",50,-3.15,3.15) ;
+  TH1F* hPt_Zp = new TH1F("zprime_pt","Z' pt",50,-10,200) ;
+  TH1F* hPt_lmax = new TH1F("lmax_pt","lmax pt",50,-10,300) ;
+  TH1F* hEta_lmax = new TH1F("lmax_eta","lmax eta",50,-6,6) ;
+  TH1F* hPhi_lmax = new TH1F("lmax_phi","lmax phi",50,-3.16,3.16) ;
+  TH1F* hPt_lmin = new TH1F("lmin_pt","lmin pt",50,0,200) ;
+  TH1F* hEta_lmin = new TH1F("lmin_eta","lmin eta",50,-6,6) ;
+  TH1F* hPhi_lmin = new TH1F("lmin_phi","lmin phi",50,-3.16,3.16) ;
+
+  TH1F* hPt_bj = new TH1F("Pt_bj","bj pt",50,0,350) ;
+  TH1F* hEta_bj = new TH1F("Eta_bj","bj eta",50,-6,6) ;
+  TH1F* hPhi_bj = new TH1F("Phi_bj","bj phi",50,-3.16,3.16) ;
+  TH1F* hPz_bj = new TH1F("Pz_bj","bj pz",50,-500,500) ;
+  TH1F* hPt_bj_ = new TH1F("Pt_bj_","bj_ pt",50,0,300) ;
+  TH1F* hEta_bj_ = new TH1F("Eta_bj_","bj_ eta",50,-6,6) ;
+  TH1F* hPhi_bj_ = new TH1F("Phi_bj_","bj_ phi",50,-3.16,3.16) ;
+  TH1F* hPz_bj_ = new TH1F("Pz_bj_","bj_ pz",50,-500,500) ;
+
+  TH1F* hPt_met_muon = new TH1F("met_muon_pt","met muon pt",50,0,200) ;
+  TH1F* hM_met_muon = new TH1F("met_muon_mass","met muon mass",50,0,200) ;
+  TH1F* hM_reco_wpz10 = new TH1F("reco_w_masspz10","reco w mass pz10",200,0,400) ;
+  TH1F* hM_reco_wpz20 = new TH1F("reco_w_masspz20","reco w mass pz20",200,0,400) ;
+  TH1F* hM_reco_wpz30 = new TH1F("reco_w_masspz30","reco w mass pz30",200,0,400) ;
+  TH1F* hM_reco_wpz40 = new TH1F("reco_w_masspz40","reco w mass pz40",200,0,400) ;
+
+  TH1F* hPt_mu111 = new TH1F("mu1_pt","muon1 pt",50,-10,300) ;
+/*  TH1F* hEta_mu1 = new TH1F("mu1_eta","muon1 eta",50,-6,6) ;
+  TH1F* hPhi_mu1 = new TH1F("mu1_phi","muon1 phi",50,-3.16,3.16) ;
+  TH1F* hPt_mu2 = new TH1F("mu2_pt","muon2 pt",50,-10,300) ;
+  TH1F* hEta_mu2 = new TH1F("mu2_eta","muon2 eta",50,-6,6) ;
+  TH1F* hPhi_mu2 = new TH1F("mu2_phi","muon2 phi",50,-3.16,3.16) ;
+
+  TH1F* hPt_mu1_nu = new TH1F("mu1_nu_pt","mu1_nu pt",50,-10,300) ;
+  TH1F* hEta_mu1_nu = new TH1F("mu1_nu_eta","mu1 nu eta",50,-6,6) ;
+  TH1F* hPhi_mu1_nu = new TH1F("mu1_nu_phi","mu1 nu phi",50,-3.16,3.16) ;
+  TH1F* hPt_mu2_nu = new TH1F("mu2_nu_pt","mu2_nu pt",50,-10,300) ;
+  TH1F* hEta_mu2_nu = new TH1F("mu2_nu_eta","mu2 nu eta",50,-6,6) ;
+  TH1F* hPhi_mu2_nu = new TH1F("mu2_nu_phi","mu2 nu phi",50,-3.16,3.16) ;
+
+  TH1F* hPt_elec1_nu = new TH1F("elec1_nu_pt","elec1 nu pt",50,-10,300) ;
+  TH1F* hEta_elec1_nu = new TH1F("elec1_nu_eta","elec1 nu eta",50,-6,6) ;
+  TH1F* hPhi_elec1_nu = new TH1F("elec1_nu_phi","elec1 nu phi",50,-3.16,3.16) ;
+  TH1F* hPt_elec2_nu = new TH1F("elec2_nu_pt","elec2 nu pt",50,-10,300) ;
+  TH1F* hEta_elec2_nu = new TH1F("elec2_nu_eta","elec2 nu eta",50,-6,6) ;
+  TH1F* hPhi_elec2_nu = new TH1F("elec2_nu_phi","elec2 nu phi",50,-3.16,3.16) ;
+
+  TH1F* hPt_elec1 = new TH1F("elec1_pt","elec1 pt",50,-10,300) ;
+  TH1F* hEta_elec1 = new TH1F("elec1_eta","elec1 eta",50,-6,6) ;
+  TH1F* hPhi_elec1 = new TH1F("elec1_phi","elec1 phi",50,-3.16,3.16) ;
+  TH1F* hPt_elec2 = new TH1F("elec2_pt","elec2 pt",50,-10,300) ;
+  TH1F* hEta_elec2 = new TH1F("elec2_eta","elec2 eta",50,-6,6) ;
+  TH1F* hPhi_elec2 = new TH1F("elec2_phi","elec2 phi",50,-3.16,3.16) ;
+*/
+
+
+  TH1F** hPt_bq = new TH1F*[4];
+  TH1F** hEta_bq = new TH1F*[4];
+  TH1F** hPhi_bq = new TH1F*[4];
+
+  TH1F** hPt_q = new TH1F*[4];
+  TH1F** hEta_q = new TH1F*[4];
+  TH1F** hPhi_q = new TH1F*[4];
+
+cout<<"I am here: "<<endl;
+  for (int iquark=0 ; iquark<4 ; iquark++) {
+    ostringstream oss;
+    oss << "q" << iquark ;
+    string ptstr = oss.str()+"_pt";
+    hPt_q[iquark] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,300) ;
+    string etastr=oss.str()+"_eta";
+    hEta_q[iquark] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_q[iquark] = new TH1F(phistr.c_str(),phistr.c_str(),50,-3.5,3.5) ;
+  }
+
+    for (int bquark=0 ; bquark<4 ; bquark++) {
+    ostringstream oss;
+    oss << "bq" << bquark ;
+    string ptstr = oss.str()+"_pt";
+    hPt_bq[bquark] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,300) ;
+    string etastr=oss.str()+"_eta";
+    hEta_bq[bquark] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_bq[bquark] = new TH1F(phistr.c_str(),phistr.c_str(),50,-5,5) ;
+  }
+ 
+  TH1F** hPt_mu = new TH1F*[4];
+  TH1F** hEta_mu = new TH1F*[4];
+  TH1F** hPhi_mu = new TH1F*[4];
+  for (int mu=0 ; mu<4 ; mu++) {
+    ostringstream oss;
+    oss << "muon" << mu ;
+    string ptstr = oss.str()+"_pt";
+    hPt_mu[mu] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,300) ;
+    string etastr=oss.str()+"_eta";
+    hEta_mu[mu] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_mu[mu] = new TH1F(phistr.c_str(),phistr.c_str(),50,-5,5) ;
+  }
+  TH1F** hPt_elec = new TH1F*[4];
+  TH1F** hEta_elec = new TH1F*[4];
+  TH1F** hPhi_elec = new TH1F*[4];
+  for (int ele=0 ; ele<4 ; ele++) {
+    ostringstream oss;
+    oss << "elec" << ele ;
+    string ptstr = oss.str()+"_pt";
+    hPt_elec[ele] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,300) ;
+    string etastr=oss.str()+"_eta";
+    hEta_elec[ele] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_elec[ele] = new TH1F(phistr.c_str(),phistr.c_str(),50,-3.16,3.16) ;
+  }
+
+
+
+  TH1F* hCoM_eta_top = new TH1F("top_eta_CoM","top_eta_CoM",50, -5,5);
+  TH1F* hCoM_pt_top = new TH1F("top_pt_CoM","top_pt_CoM",50, 0, 500);
+  TH1F* hCoM_theta_top = new TH1F("top_theta_CoM","top_theta_CoM",50, 0,3.16);
+//  TH1F* hCoM_theta_top = new TH1F("top_theta_CoM","top_theta_CoM",50, -M_PI,M_PI);
+// --- end histogram definition
+
+  int nlept=0, nsemi=0, nhadr=0;
+  ifstream ff(lhefname.c_str(),ios::in); //ouverture du fichier .lhe
+  //ifstream ff("test.lhe",ios::in); //ouverture du fichier .lhe
+  //ifstream ff("/home/cms/perries/madgraph-newphysics/s1/madevent/Events/zp4000_unweighted_events.lhe",ios::in); //ouverture du fichier .lhe
+  //ifstream ff("/home/cms/perries/madgraph-newphysics/QCD/madevent/Events/qcd_unweighted_events.lhe",ios::in); //ouverture du fichier .lhe
+  int negativeWeight = 0;
+  long long line = 0;
+  while(!ff.eof()) {
+    std::stringstream buffer;
+    ff>>tt;
+    buffer << tt << std::endl;
+    line++;
+//    cout<<"this is line: "<<line<<endl;
+
+    if(tt=="<event>") {
+      ff>>npart>>idprocess>>weight>>scale>>alpha_em>>alpha_s; //event definition
+      buffer << npart << " " << idprocess << " " << weight << " " << scale << " " << alpha_em << " " << alpha_s << std::endl;
+      line++;
+//    cout<<"this is line inside: "<<line<<endl;
+      event++;
+      if (weight < 0) {
+        negativeWeight++;
+        weight = -1;
+      } else {
+        weight = 1;
+      }
+      /*weight = 1.;*/
+ //     if (event==15)return false;
+      if (event%1==0) cout << "reading event "<< event << endl;
+      int lmin=-1, lmax=-1, bmin=-1, met1=-1, met2=-1, bmax=-1, met=-1, topLep,topbJet, tbarLep, tbarbJet, top_jet, tbar_jet;
+      int xd = -1, xd_ = -1; //dark matter work
+      int Part_Id, Moth_Id, Part_absId, Moth_absId;
+      int n_muon=0, n_elec=0, n_mu_nu=0, n_elec_nu=0, n_topjets=0, n_tbarjets=0, n_topbjets=0, n_bbar=0;
+      int  bj[2]={-1,-1};
+      int muon[4]={-1,-1,-1,-1};
+      int mu_nu[4]={-1,-1,-1,-1};
+      int elec[4]={-1,-1,-1,-1};
+      int elec_nu[4]={-1,-1,-1,-1};
+      int bq[4]={-1,-1,-1,-1};
+      int q[4]={-1,-1,-1,-1};
+      int top=-1,topbar=-1,zprime=-1;
+      int *Id      = new int[npart+1];
+      int *Status  = new int[npart+1];
+      int *Mother1 = new int[npart+1];
+      int *Mother2 = new int[npart+1];
+      int *Color1  = new int[npart+1];
+      int *Color2  = new int[npart+1];
+      double *px = new double[npart+1];
+      double *py = new double[npart+1];
+      double *pz = new double[npart+1];
+      double *E = new double[npart+1];
+      double *m = new double[npart+1];
+      double *lifetime = new double[npart+1];
+      double *spin = new double[npart+1];
+      TLorentzVector **v = new TLorentzVector*[npart+1];
+      TLorentzVector v_muon1, v_muon2, v_muon3, v_muon4,v_muon, v_elec, v_mu_nu1, v_mu_nu2, v_mu_nu3, v_mu_nu4, v_mu_nu, v_elec_nu;
+      // in lhe first line is number 1, so fill unused array [0] with a crazy value;
+      Id[0]= -99999;
+      Status[0]= -99999;
+      Mother1[0]= -99999;
+      Mother2[0]= -99999;
+      Color1[0]= -99999;
+      Color2[0]= -99999;
+      px[0]= -99999;
+      py[0]= -99999;
+      pz[0]= -99999;
+      E[0]= -99999;
+      m[0]= -99999;
+      lifetime[0]= -99999;
+      spin[0]= -99999;
+     for (int i=1 ; i<npart+1 ; i++) { //start at one
+        ff >> Id[i] >> Status[i] >> Mother1[i] >> Mother2[i] >> Color1[i] >> Color2[i]
+           >> px[i] >> py[i] >> pz[i] >> E[i] >> m[i] >> lifetime[i] >> spin[i] ;
+        buffer << Id[i] << " " << Status[i] << " " << std::endl;
+        line++;
+        v[i] = new TLorentzVector(px[i], py[i], pz[i], E[i]);
+        if (Status[i]==-1) continue; // status -1 = initial quark ==> skip
+        if (Id[i]==6)  top=i;
+        if (Id[i]==-6) topbar=i;
+        if (Id[i]>6000000) zprime=i;
+
+
+////------------b qurks ----------------------------
+        if (abs(Id[Mother1[i]])==6) { //Mother top
+	  if (abs(Id[i])==5) { // bjets
+//cout<<"this is b qurks i:          "<<i<<endl;
+//cout<<"this is pt: "<<v[i]->Pt()<<endl;
+	         if (bq[0] == -1) bq[0]=i;
+            else if (bq[1]==-1) bq[1]=i;
+            else if (bq[2]==-1) bq[2]=i;
+            else if (bq[3]==-1) bq[3]=i;
+            else cout << "ERROR : more than 4 b quarks" << endl;
+           }
+	}
+        
+	if (abs(Id[Mother1[i]])==24) { //Mother w boson
+//cout<<"abs(Id[Mother1[i]]):  "<<abs(Id[Mother1[i]])<<endl;
+         if (abs(Id[i]) < 5) { // light quarks
+            cout << q[i] << endl;
+            if (q[0] == -1) q[0]=i;
+            else if (q[1]==-1) q[1]=i;
+            else if (q[2]==-1) q[2]=i;
+            else if (q[3]==-1) q[3]=i;
+            else cout << "ERROR : more than 4 light quarks" << endl;
+          }
+
+        if ( abs(Id[i])==13 ) { // muons
+	         if (muon[0] == -1) muon[0]=i;
+            else if (muon[1]==-1) muon[1]=i;
+            else if (muon[2]==-1) muon[2]=i;
+            else if  (muon[3]==-1) muon[3]=i;
+	    else cout << "ERROR : more than 4 b muons" << endl;
+
+
+//if (v[i]->Pt() <= 30 || abs(v[i]->Eta()) > 2.5) continue;
+//          v_muon.SetPxPyPzE(v[i]->Px(),v[i]->Py(),v[i]->Pz(),v[i]->E());
+          n_muon++;     
+          }
+          if ( abs(Id[i])==14 ) {//muon neutrinos
+	         if (mu_nu[0] == -1) mu_nu[0]=i;
+            else if (mu_nu[1]==-1) mu_nu[1]=i;
+            else if (mu_nu[2]==-1) mu_nu[2]=i;
+            else if (mu_nu[3]==-1) mu_nu[3]=i;
+            else cout << "ERROR : more than 4 muon neutrinos" << endl;
+
+
+//if (v[i]->Pt() <= 30 || abs(v[i]->Eta()) > 2.5) continue;
+//          v_mu_nu.SetPxPyPzE(v[i]->Px(),v[i]->Py(),v[i]->Pz(),v[i]->E());
+          n_mu_nu++;
+	  }
+
+        if ( abs(Id[i])==11 ) { // electrons
+	         if (elec[0] == -1) elec[0]=i;
+            else if (elec[1]==-1) elec[1]=i;
+            else if (elec[2]==-1) elec[2]=i;
+            else if (elec[3]==-1) elec[3]=i;
+	    else cout << "ERROR : more than 4 electrons" << endl;
+
+
+//if (v[i]->Pt() <= 30 || abs(v[i]->Eta()) > 2.5) continue;
+//          v_elec.SetPxPyPzE(v[i]->Px(),v[i]->Py(),v[i]->Pz(),v[i]->E());
+          n_elec++;//cout<<" inside elec:  "<<abs(Id[i])<<endl;
+          }
+          if ( abs(Id[i])==12 ) {// electron neutrino
+	         if (elec_nu[0] == -1) elec_nu[0]=i;
+            else if (elec_nu[1]==-1) elec_nu[1]=i;
+            else if (elec_nu[2]==-1) elec_nu[2]=i;
+            else if (elec_nu[3]==-1) elec_nu[3]=i;
+	    else cout << "ERROR : more than 4 electron neutrinos" << endl;
+
+
+//if (v[i]->Pt() <= 30 || abs(v[i]->Eta()) > 2.5) continue;
+ //         v_elec_nu.SetPxPyPzE(v[i]->Px(),v[i]->Py(),v[i]->Pz(),v[i]->E());
+          n_elec_nu++;//cout<<"inside elec nu:  "<<abs(Id[i])<<endl;
+          }
+
+	}
+
+} //loop of i
+  cout<<" no: of muon:  "<<n_muon<<",  no. of muon nu:  "<<n_mu_nu<<endl;
+  cout<<" no: of elec:  "<<n_elec<<",  no. of elec nu:  "<<n_elec_nu<<endl;
+//cout<<"this n lep: "<<n_lep<<",  no of nu:  "<<n_nu<<endl;
+//---------Fill b-quarks array and then sort in ascending order
+	double bq_pt[4] = {v[bq[0]]->Pt(),v[bq[1]]->Pt(),v[bq[2]]->Pt(),v[bq[3]]->Pt()};
+	std::sort(bq_pt,bq_pt+4);
+	double bq_eta[4] = {v[bq[0]]->Eta(),v[bq[1]]->Eta(),v[bq[2]]->Eta(),v[bq[3]]->Eta()};	
+	std::sort(bq_eta,bq_eta+4);
+	double bq_phi[4] = {v[bq[0]]->Phi(),v[bq[1]]->Phi(),v[bq[2]]->Phi(),v[bq[3]]->Phi()};	
+	std::sort(bq_phi,bq_phi+4);
+      // b-quarks kinematics
+     for (int nbq=0; nbq<4 ; nbq++) {
+	  hPt_bq[nbq]->Fill( bq_pt[nbq] );
+          hEta_bq[nbq]->Fill( bq_eta[nbq] );
+          hPhi_bq[nbq]->Fill( bq_phi[nbq] );
+      }
+//---------Fill muons array and then sort in ascending order
+if (n_muon==4){
+double muon_pt[4] = {v[muon[0]]->Pt(),v[muon[1]]->Pt(),v[muon[2]]->Pt(),v[muon[3]]->Pt()};	
+        std::sort(muon_pt,muon_pt+4);
+double muon_eta[4] = {v[muon[0]]->Eta(),v[muon[1]]->Eta(),v[muon[2]]->Eta(),v[muon[3]]->Eta()};	
+        std::sort(muon_eta,muon_eta+4);
+double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi(),v[muon[2]]->Phi(),v[muon[3]]->Phi()};	
+        std::sort(muon_phi,muon_phi+4);
+	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<muon_pt[1]<<",  "<<muon_pt[2]<<",  "<<muon_pt[3]<<",  "<<endl;
+      v_muon1.SetPxPyPzE(v[muon[0]]->Px(),v[muon[0]]->Py(),v[muon[0]]->Pz(),v[muon[0]]->E());
+      v_muon2.SetPxPyPzE(v[muon[1]]->Px(),v[muon[1]]->Py(),v[muon[1]]->Pz(),v[muon[1]]->E());
+      v_muon3.SetPxPyPzE(v[muon[2]]->Px(),v[muon[2]]->Py(),v[muon[2]]->Pz(),v[muon[2]]->E());
+      v_muon4.SetPxPyPzE(v[muon[3]]->Px(),v[muon[3]]->Py(),v[muon[3]]->Pz(),v[muon[3]]->E());
+TLorentzVector v_muons[4]={v_muon1, v_muon2, v_muon3, v_muon4};
+      // muon kinematics
+   	for (int n_m=0; n_m<4 ; n_m++) {
+	  hPt_mu[n_m]->Fill( muon_pt[n_m] );
+          hEta_mu[n_m]->Fill( muon_eta[n_m] );
+          hPhi_mu[n_m]->Fill( muon_phi[n_m] );
+      }
+      v_mu_nu1.SetPxPyPzE(v[mu_nu[0]]->Px(),v[mu_nu[0]]->Py(),v[mu_nu[0]]->Pz(),v[mu_nu[0]]->E());
+      v_mu_nu2.SetPxPyPzE(v[mu_nu[1]]->Px(),v[mu_nu[1]]->Py(),v[mu_nu[1]]->Pz(),v[mu_nu[1]]->E());
+      v_mu_nu3.SetPxPyPzE(v[mu_nu[2]]->Px(),v[mu_nu[2]]->Py(),v[mu_nu[2]]->Pz(),v[mu_nu[2]]->E());
+      v_mu_nu4.SetPxPyPzE(v[mu_nu[3]]->Px(),v[mu_nu[3]]->Py(),v[mu_nu[3]]->Pz(),v[mu_nu[3]]->E());
+TLorentzVector  v_mu_neutrinos[4]={v_mu_nu1, v_mu_nu2, v_mu_nu3, v_mu_nu4};
+for (int i=0; i<4; i++){cout<<"this is i:  "<<i<<endl;
+for (int j=0; j<4; j++){cout<<"this is j:  "<<j<<endl;
+double w_mass = (v_muons[i]+v_mu_neutrinos[j]).M();
+cout<<"mass of w:   "<<w_mass<<endl;
+}}
+
+     }
+if (n_muon==3){
+double muon_pt[4] = {v[muon[0]]->Pt(),v[muon[1]]->Pt(),v[muon[2]]->Pt()};	
+        std::sort(muon_pt,muon_pt+3);
+double muon_eta[4] = {v[muon[0]]->Eta(),v[muon[1]]->Eta(),v[muon[2]]->Eta()};	
+        std::sort(muon_eta,muon_eta+3);
+double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi(),v[muon[2]]->Phi()};	
+        std::sort(muon_phi,muon_phi+3);
+
+	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<muon_pt[1]<<",  "<<muon_pt[2]<<",  "<<endl;
+             for (int n_m=0; n_m<3 ; n_m++) {
+	  hPt_mu[n_m]->Fill( muon_pt[n_m] );
+          hEta_mu[n_m]->Fill( muon_eta[n_m] );
+          hPhi_mu[n_m]->Fill( muon_phi[n_m] );
+          }
+
+double elec_pt[4] = {v[elec[0]]->Pt()};	
+        std::sort(elec_pt,elec_pt+1);
+double elec_eta[4] = {v[elec[0]]->Eta()};	
+        std::sort(elec_eta,elec_eta+1);
+double elec_phi[4] = {v[elec[0]]->Phi()};	
+        std::sort(elec_phi,elec_phi+1);
+        }
+
+if (n_muon==2){
+double muon_pt[4] = {v[muon[0]]->Pt(),v[muon[1]]->Pt()};	
+        std::sort(muon_pt,muon_pt+2);
+double muon_eta[4] = {v[muon[0]]->Eta(),v[muon[1]]->Eta()};	
+        std::sort(muon_eta,muon_eta+2);
+double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi()};	
+        std::sort(muon_phi,muon_phi+2);
+
+	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<muon_pt[1]<<endl;
+	for (int n_m=0; n_m<2 ; n_m++) {
+	  hPt_mu[n_m]->Fill( muon_pt[n_m] );
+          hEta_mu[n_m]->Fill( muon_eta[n_m] );
+          hPhi_mu[n_m]->Fill( muon_phi[n_m] );
+          }
+
+double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt()};	
+        std::sort(elec_pt,elec_pt+2);
+double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta()};	
+        std::sort(elec_eta,elec_eta+2);
+double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi()};	
+        std::sort(elec_phi,elec_phi+2);
+
+	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<endl;
+
+        }
+if (n_muon==1){
+double muon_pt[4] = {v[muon[0]]->Pt()};	
+        std::sort(muon_pt,muon_pt+1);
+double muon_eta[4] = {v[muon[0]]->Eta()};	
+        std::sort(muon_eta,muon_eta+1);
+double muon_phi[4] = {v[muon[0]]->Phi()};	
+        std::sort(muon_phi,muon_phi+1);
+
+	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<endl;
+	for (int n_m=0; n_m<1 ; n_m++) {
+	  hPt_mu[n_m]->Fill( muon_pt[n_m] );
+          hEta_mu[n_m]->Fill( muon_eta[n_m] );
+          hPhi_mu[n_m]->Fill( muon_phi[n_m] );
+          }
+
+double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt(),v[elec[2]]->Pt()};	
+        std::sort(elec_pt,elec_pt+3);
+double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta(),v[elec[2]]->Eta()};	
+        std::sort(elec_eta,elec_eta+3);
+double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi(),v[elec[2]]->Phi()};	
+        std::sort(elec_phi,elec_phi+3);
+
+	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<",  "<<elec_pt[2]<<",  "<<endl;
+	}
+
+if (n_elec==4){
+double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt(),v[elec[2]]->Pt(),v[elec[3]]->Pt()};	
+        std::sort(elec_pt,elec_pt+4);
+double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta(),v[elec[2]]->Eta(),v[elec[3]]->Eta()};	
+        std::sort(elec_eta,elec_eta+4);
+double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi(),v[elec[2]]->Phi(),v[elec[3]]->Phi()};	
+        std::sort(elec_phi,elec_phi+4);
+
+	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<",  "<<elec_pt[2]<<",  "<<elec_pt[3]<<",  "<<endl;
+	}
+
+// sort the quarks
+      int nquarks=0;
+      if (q[1] != -1) nquarks = 2;
+      if (q[3] != -1) nquarks = 4;
+
+
+      // light quarks kinematics
+      for (int nq=0; nq<nquarks ; nq++) {
+        hPt_q[nq]->Fill( v[q[nq]]->Pt() );
+        hEta_q[nq]->Fill( v[q[nq]]->Eta() );
+        hPhi_q[nq]->Fill( v[q[nq]]->Phi() );
+      }
+
+// --- end filling the histograms
+      ff>>tt;
+      line++;
+      //if (event==100)  break;
+      delete Id;
+      delete Status;
+      delete Mother1;
+      delete Mother2;
+      delete Color1;
+      delete Color2;
+      delete px;
+      delete py;
+      delete pz;
+      delete E;
+      delete m;
+      delete lifetime;
+      delete spin;
+      for (int k=1 ; k<npart+1 ; delete v[k++]);
+
+
+
+    }
+
+}
+  cout << " Total number of events --> " << event << endl;
+/*  TCanvas *c1 = new TCanvas("c1", "H to ttbar",22,100,623,500);  // 3rd option expansion on x-axis, 4th option on y axis
+   c1->Range(-33.02326,-282.867,254.8837,2508.087);
+   c1->SetFillColor(0);
+   c1->SetBorderMode(0);
+   c1->SetBorderSize(2);
+   c1->SetTickx(1);
+   c1->SetTicky(1);
+   c1->SetLeftMargin(0.1147011);
+   c1->SetRightMargin(0.19063);
+   c1->SetFrameBorderMode(0);
+   c1->SetFrameBorderMode(0);
+   
+   c1->cd();
+//   hPt_higgs->SetFillColor(kGreen);
+   hPt_higgs->GetXaxis()->SetTitle("Higgs p_{T}");
+   hPt_higgs->GetXaxis()->SetLabelSize(0.04);
+   hPt_higgs->GetXaxis()->SetTitleSize(0.05);
+   hPt_higgs->GetXaxis()->SetTitleOffset(0.9);
+
+hPt_higgs->Scale(1/hPt_higgs->Integral());
+hPt_higgs->Draw("HIST");
+c1->SaveAs("hPt_higgs.pdf");
+//hE_Et->Scale(1/hE_Et->Integral());
+hE_Et->Draw("HIST");
+c1->SaveAs("hE.pdf");
+*/
+
+  TFile *rootfile = new TFile(rootfname.c_str(),"recreate");
+
+ 
+
+ /* hDPhi_nu_jets->Write();
+  hgen_met_pt->Write();
+
+  hdphi_gj_gl->Write();
+  hdR_bjet_bbar->Write();
+  hdR_ljets_lep->Write();
+  hdR_b_lep->Write();
+  hDPhi_tbarLep_topbJet->Write();
+  hDPhi_Jets_Lep->Write();
+  hDPhi_bJets_lJets->Write();
+  hDPhi_bJets_bbar->Write();
+  hDPhi_topLep_tbarbJet->Write();
+  hDPhi_topLep_tbarJet->Write();
+  hMtt->Write();
+  hPt_ttbar->Write();
+  hdphi_ttbar->Write();
+  hPt_top->Write();
+  hEta_top->Write();
+  hPhi_top->Write();
+  hPx_top->Write();
+  hPy_top->Write();
+  hPx_top_tbar->Write();
+  hPy_top_tbar->Write();
+  hPt_tbar->Write();
+  hEta_tbar->Write();
+  hPhi_tbar->Write();
+  hPx_tbar->Write();
+  hPy_tbar->Write();
+  hPt_Zp->Write();
+  //hEta_Zp->Write();
+  //hPhi_Zp->Write();
+  //hNextrajets->Write();
+  hPt_lmax->Write();
+  hEta_lmax->Write();
+  hPhi_lmax->Write();
+  hPt_lmin->Write();
+  hEta_lmin->Write();
+  hPhi_lmin->Write();
+  hPt_bmax->Write();
+  hEta_bmax->Write();
+  hPhi_bmax->Write();
+  hPt_bmin->Write();
+  hEta_bmin->Write();
+  hPhi_bmin->Write();
+  hPt_met->Write();
+  hEta_met->Write();
+  hPhi_met->Write();
+  hPz_met->Write();
+  hPt_met_muon->Write();
+  hM_met_muon->Write();
+  hM_reco_wpz10->Write();
+  hM_reco_wpz20->Write();
+  hM_reco_wpz30->Write();
+  hM_reco_wpz40->Write();
+*/
+    for (int i=0;i<4;i++) {
+    hPt_bq[i]->Write();
+    hEta_bq[i]->Write();
+    hPhi_bq[i]->Write();
+  }
+
+  for (int i=0;i<4;i++) {
+    hPt_q[i]->Write();
+    hEta_q[i]->Write();
+    hPhi_q[i]->Write();
+  }
+
+    for (int i=0;i<4;i++) {
+    hPt_mu[i]->Write();
+    hEta_mu[i]->Write();
+    hPhi_mu[i]->Write();
+  }
+/*  hextrajet_flavour->Write();
+  hPt_extrajet->Write();
+  hEta_extrajet->Write();
+  hPhi_extrajet->Write();
+  hBoost_ttbar->Write();
+  hCoM_eta_top->Write();
+  hCoM_theta_top->Write();
+ */ hCoM_pt_top->Write();
+  rootfile->Close();
+
+  cout << "Events with negative weight: " << negativeWeight << endl;
+  cout << "lept decay = " << nlept*1.0/event << endl;
+  cout << "hadr decay = " << nhadr*1.0/event << endl;
+  cout << "semi decay = " << nsemi*1.0/event << endl;
+  exit(0);
+
+
+
+
+}
+float DeltaPhi(float phi1, float phi2)
+{
+  float dphi = phi2 - phi1;
+  if (fabs(dphi) > 3.14) dphi = 6.28 - fabs(dphi);
+  return dphi;
+}
+float DeltaR(float eta1, float eta2, float phi1, float phi2)
+{
+  float deta = eta2 - eta1;
+  float dphi = phi2 - phi1;
+  if (fabs(dphi) > 3.14) dphi = 6.28 - fabs(dphi);
+  float DELTAR = sqrt(pow(dphi,2)+pow(deta,2))*1.0;
+  return DELTAR;
+}
+
+
+
