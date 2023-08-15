@@ -63,9 +63,9 @@ int main(int argc, char **argv) {
   TH1F* hPt_ttbar = new TH1F("pt_ttbar","Pt ttbar",50,0,500) ;
   TH1F* hdphi_ttbar = new TH1F("dphi_ttbar","dphi ttbar",50,0,10) ;
   TH1F* hBoost_ttbar = new TH1F("boost_ttbar","Boost ttbar",50,-0.2,1.2);
-  TH1F* hPt_top = new TH1F("top_pt","top pt",50,0.0,400) ;
-  TH1F* hEta_top = new TH1F("top_eta","top eta",50,-6,6) ;
-  TH1F* hPhi_top = new TH1F("top_phi","top phi",50,-3.16,3.16) ;
+//  TH1F* hPt_top = new TH1F("top_pt","top pt",50,0.0,400) ;
+//  TH1F* hEta_top = new TH1F("top_eta","top eta",50,-6,6) ;
+//  TH1F* hPhi_top = new TH1F("top_phi","top phi",50,-3.16,3.16) ;
   TH1F* hPx_top = new TH1F("top_px","top px",50,-200,200) ;
   TH1F* hPy_top = new TH1F("top_py","top py",50,-200,200) ;
   TH2F* hPx_top_tbar = new TH2F("top_tbar_px","top_tbar px",50,-50,50,50,-50,50) ;
@@ -191,7 +191,39 @@ cout<<"I am here: "<<endl;
     string phistr=oss.str()+"_phi";
     hPhi_elec[ele] = new TH1F(phistr.c_str(),phistr.c_str(),50,-3.16,3.16) ;
   }
+  TH1F** hPt_wboson = new TH1F*[4];
+  TH1F** hEta_wboson = new TH1F*[4];
+  TH1F** hPhi_wboson = new TH1F*[4];
+  TH1F** hM_wboson = new TH1F*[4];
+  for (int wboson=0 ; wboson<4 ; wboson++) {
+    ostringstream oss;
+    oss << "wboson" << wboson ;
+    string ptstr = oss.str()+"_pt";
+    hPt_wboson[wboson] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,300) ;
+    string etastr=oss.str()+"_eta";
+    hEta_wboson[wboson] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_wboson[wboson] = new TH1F(phistr.c_str(),phistr.c_str(),50,-3.16,3.16) ;
+    string massstr=oss.str()+"_mass";
+    hM_wboson[wboson] = new TH1F(massstr.c_str(),massstr.c_str(),50,60.0,100.0) ;
+  }
 
+  TH1F** hPt_top = new TH1F*[4];
+  TH1F** hEta_top = new TH1F*[4];
+  TH1F** hPhi_top = new TH1F*[4];
+  TH1F** hM_top = new TH1F*[4];
+  for (int t=0 ; t<4 ; t++) {
+    ostringstream oss;
+    oss << "top_quark" << t ;
+    string ptstr = oss.str()+"_pt";
+    hPt_top[t] = new TH1F(ptstr.c_str(),ptstr.c_str(),50,0,600) ;
+    string etastr=oss.str()+"_eta";
+    hEta_top[t] = new TH1F(etastr.c_str(),etastr.c_str(),50,-6,6) ;
+    string phistr=oss.str()+"_phi";
+    hPhi_top[t] = new TH1F(phistr.c_str(),phistr.c_str(),50,-3.5,3.5) ;
+    string massstr=oss.str()+"_mass";
+    hM_top[t] = new TH1F(massstr.c_str(),massstr.c_str(),50,150.0,190.0) ;
+  }
 
 
   TH1F* hCoM_eta_top = new TH1F("top_eta_CoM","top_eta_CoM",50, -5,5);
@@ -256,6 +288,11 @@ cout<<"I am here: "<<endl;
       double *spin = new double[npart+1];
       TLorentzVector **v = new TLorentzVector*[npart+1];
       TLorentzVector v_muon1, v_muon2, v_muon3, v_muon4,v_muon, v_elec, v_mu_nu1, v_mu_nu2, v_mu_nu3, v_mu_nu4, v_mu_nu, v_elec_nu;
+      TLorentzVector v_elec1, v_elec2, v_elec3, v_elec4, v_elec_nu1, v_elec_nu2, v_elec_nu3, v_elec_nu4;
+      TLorentzVector v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4;
+      TLorentzVector v_bquark1, v_bquark2, v_bquark3, v_bquark4;
+      TLorentzVector v_top1, v_top2, v_top3, v_top4;
+//      TLorentzVector v_wbosons[4];
       // in lhe first line is number 1, so fill unused array [0] with a crazy value;
       Id[0]= -99999;
       Status[0]= -99999;
@@ -369,6 +406,11 @@ cout<<"I am here: "<<endl;
 	std::sort(bq_eta,bq_eta+4);
 	double bq_phi[4] = {v[bq[0]]->Phi(),v[bq[1]]->Phi(),v[bq[2]]->Phi(),v[bq[3]]->Phi()};	
 	std::sort(bq_phi,bq_phi+4);
+
+  	v_bquark1.SetPxPyPzE(v[bq[0]]->Px(),v[bq[0]]->Py(),v[bq[0]]->Pz(),v[bq[0]]->E());
+  	v_bquark2.SetPxPyPzE(v[bq[1]]->Px(),v[bq[1]]->Py(),v[bq[1]]->Pz(),v[bq[1]]->E());
+  	v_bquark3.SetPxPyPzE(v[bq[2]]->Px(),v[bq[2]]->Py(),v[bq[2]]->Pz(),v[bq[2]]->E());
+  	v_bquark4.SetPxPyPzE(v[bq[3]]->Px(),v[bq[3]]->Py(),v[bq[3]]->Pz(),v[bq[3]]->E());
       // b-quarks kinematics
      for (int nbq=0; nbq<4 ; nbq++) {
 	  hPt_bq[nbq]->Fill( bq_pt[nbq] );
@@ -383,12 +425,11 @@ double muon_eta[4] = {v[muon[0]]->Eta(),v[muon[1]]->Eta(),v[muon[2]]->Eta(),v[mu
         std::sort(muon_eta,muon_eta+4);
 double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi(),v[muon[2]]->Phi(),v[muon[3]]->Phi()};	
         std::sort(muon_phi,muon_phi+4);
-	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<muon_pt[1]<<",  "<<muon_pt[2]<<",  "<<muon_pt[3]<<",  "<<endl;
+
       v_muon1.SetPxPyPzE(v[muon[0]]->Px(),v[muon[0]]->Py(),v[muon[0]]->Pz(),v[muon[0]]->E());
       v_muon2.SetPxPyPzE(v[muon[1]]->Px(),v[muon[1]]->Py(),v[muon[1]]->Pz(),v[muon[1]]->E());
       v_muon3.SetPxPyPzE(v[muon[2]]->Px(),v[muon[2]]->Py(),v[muon[2]]->Pz(),v[muon[2]]->E());
       v_muon4.SetPxPyPzE(v[muon[3]]->Px(),v[muon[3]]->Py(),v[muon[3]]->Pz(),v[muon[3]]->E());
-TLorentzVector v_muons[4]={v_muon1, v_muon2, v_muon3, v_muon4};
       // muon kinematics
    	for (int n_m=0; n_m<4 ; n_m++) {
 	  hPt_mu[n_m]->Fill( muon_pt[n_m] );
@@ -399,14 +440,30 @@ TLorentzVector v_muons[4]={v_muon1, v_muon2, v_muon3, v_muon4};
       v_mu_nu2.SetPxPyPzE(v[mu_nu[1]]->Px(),v[mu_nu[1]]->Py(),v[mu_nu[1]]->Pz(),v[mu_nu[1]]->E());
       v_mu_nu3.SetPxPyPzE(v[mu_nu[2]]->Px(),v[mu_nu[2]]->Py(),v[mu_nu[2]]->Pz(),v[mu_nu[2]]->E());
       v_mu_nu4.SetPxPyPzE(v[mu_nu[3]]->Px(),v[mu_nu[3]]->Py(),v[mu_nu[3]]->Pz(),v[mu_nu[3]]->E());
-TLorentzVector  v_mu_neutrinos[4]={v_mu_nu1, v_mu_nu2, v_mu_nu3, v_mu_nu4};
-for (int i=0; i<4; i++){cout<<"this is i:  "<<i<<endl;
-for (int j=0; j<4; j++){cout<<"this is j:  "<<j<<endl;
-double w_mass = (v_muons[i]+v_mu_neutrinos[j]).M();
-cout<<"mass of w:   "<<w_mass<<endl;
-}}
 
-     }
+      //  w boson lorentz vectors
+        v_w_boson1 = v_muon1+v_mu_nu1;
+	v_w_boson2 = v_muon2+v_mu_nu2;
+	v_w_boson3 = v_muon3+v_mu_nu3;
+	v_w_boson4 = v_muon4+v_mu_nu4;
+
+TLorentzVector v_wbosons[4]={v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4};
+	for (int wb=0; wb<4 ; wb++) {
+        hPt_wboson[wb]->Fill( v_wbosons[wb].Pt() );
+        hEta_wboson[wb]->Fill( v_wbosons[wb].Eta() );
+        hPhi_wboson[wb]->Fill( v_wbosons[wb].Phi() );
+        hM_wboson[wb]->Fill( v_wbosons[wb].M() );
+      }
+
+	// top quark kinematics
+	v_top1 = v_w_boson1+v_bquark1;
+	v_top2 = v_w_boson2+v_bquark2;
+	v_top3 = v_w_boson3+v_bquark3;
+	v_top4 = v_w_boson4+v_bquark4;
+
+}
+
+     
 if (n_muon==3){
 double muon_pt[4] = {v[muon[0]]->Pt(),v[muon[1]]->Pt(),v[muon[2]]->Pt()};	
         std::sort(muon_pt,muon_pt+3);
@@ -414,6 +471,9 @@ double muon_eta[4] = {v[muon[0]]->Eta(),v[muon[1]]->Eta(),v[muon[2]]->Eta()};
         std::sort(muon_eta,muon_eta+3);
 double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi(),v[muon[2]]->Phi()};	
         std::sort(muon_phi,muon_phi+3);
+      v_muon1.SetPxPyPzE(v[muon[0]]->Px(),v[muon[0]]->Py(),v[muon[0]]->Pz(),v[muon[0]]->E());
+      v_muon2.SetPxPyPzE(v[muon[1]]->Px(),v[muon[1]]->Py(),v[muon[1]]->Pz(),v[muon[1]]->E());
+      v_muon3.SetPxPyPzE(v[muon[2]]->Px(),v[muon[2]]->Py(),v[muon[2]]->Pz(),v[muon[2]]->E());
 
 	cout<<"muon_pt :  "<<muon_pt[0]<<",  "<<muon_pt[1]<<",  "<<muon_pt[2]<<",  "<<endl;
              for (int n_m=0; n_m<3 ; n_m++) {
@@ -421,6 +481,14 @@ double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi(),v[muon[2]]->Phi()};
           hEta_mu[n_m]->Fill( muon_eta[n_m] );
           hPhi_mu[n_m]->Fill( muon_phi[n_m] );
           }
+      v_mu_nu1.SetPxPyPzE(v[mu_nu[0]]->Px(),v[mu_nu[0]]->Py(),v[mu_nu[0]]->Pz(),v[mu_nu[0]]->E());
+      v_mu_nu2.SetPxPyPzE(v[mu_nu[1]]->Px(),v[mu_nu[1]]->Py(),v[mu_nu[1]]->Pz(),v[mu_nu[1]]->E());
+      v_mu_nu3.SetPxPyPzE(v[mu_nu[2]]->Px(),v[mu_nu[2]]->Py(),v[mu_nu[2]]->Pz(),v[mu_nu[2]]->E());
+      //  w boson lorentz vectors
+        v_w_boson1 = v_muon1+v_mu_nu1;
+	v_w_boson2 = v_muon2+v_mu_nu2;
+	v_w_boson3 = v_muon3+v_mu_nu3;
+
 
 double elec_pt[4] = {v[elec[0]]->Pt()};	
         std::sort(elec_pt,elec_pt+1);
@@ -428,8 +496,26 @@ double elec_eta[4] = {v[elec[0]]->Eta()};
         std::sort(elec_eta,elec_eta+1);
 double elec_phi[4] = {v[elec[0]]->Phi()};	
         std::sort(elec_phi,elec_phi+1);
-        }
+      v_elec1.SetPxPyPzE(v[elec[0]]->Px(),v[elec[0]]->Py(),v[elec[0]]->Pz(),v[elec[0]]->E());
 
+      v_elec_nu1.SetPxPyPzE(v[elec_nu[0]]->Px(),v[elec_nu[0]]->Py(),v[elec_nu[0]]->Pz(),v[elec_nu[0]]->E());
+
+      v_w_boson4 = v_elec1 + v_elec_nu1;
+TLorentzVector v_wbosons[4]={v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4};
+	for (int wb=0; wb<4 ; wb++) {
+        hPt_wboson[wb]->Fill( v_wbosons[wb].Pt() );
+        hEta_wboson[wb]->Fill( v_wbosons[wb].Eta() );
+        hPhi_wboson[wb]->Fill( v_wbosons[wb].Phi() );
+        hM_wboson[wb]->Fill( v_wbosons[wb].M() );
+    }
+
+	// top quark kinematics
+	v_top1 = v_w_boson1+v_bquark1;
+	v_top2 = v_w_boson2+v_bquark2;
+	v_top3 = v_w_boson3+v_bquark3;
+	v_top4 = v_w_boson4+v_bquark4;
+
+}
 if (n_muon==2){
 double muon_pt[4] = {v[muon[0]]->Pt(),v[muon[1]]->Pt()};	
         std::sort(muon_pt,muon_pt+2);
@@ -444,6 +530,15 @@ double muon_phi[4] = {v[muon[0]]->Phi(),v[muon[1]]->Phi()};
           hEta_mu[n_m]->Fill( muon_eta[n_m] );
           hPhi_mu[n_m]->Fill( muon_phi[n_m] );
           }
+      v_muon1.SetPxPyPzE(v[muon[0]]->Px(),v[muon[0]]->Py(),v[muon[0]]->Pz(),v[muon[0]]->E());
+      v_muon2.SetPxPyPzE(v[muon[1]]->Px(),v[muon[1]]->Py(),v[muon[1]]->Pz(),v[muon[1]]->E());
+
+      v_mu_nu1.SetPxPyPzE(v[mu_nu[0]]->Px(),v[mu_nu[0]]->Py(),v[mu_nu[0]]->Pz(),v[mu_nu[0]]->E());
+      v_mu_nu2.SetPxPyPzE(v[mu_nu[1]]->Px(),v[mu_nu[1]]->Py(),v[mu_nu[1]]->Pz(),v[mu_nu[1]]->E());
+
+  	//  w boson lorentz vectors
+        v_w_boson1 = v_muon1+v_mu_nu1;
+	v_w_boson2 = v_muon2+v_mu_nu2;
 
 double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt()};	
         std::sort(elec_pt,elec_pt+2);
@@ -452,9 +547,29 @@ double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta()};
 double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi()};	
         std::sort(elec_phi,elec_phi+2);
 
-	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<endl;
+      v_elec1.SetPxPyPzE(v[elec[0]]->Px(),v[elec[0]]->Py(),v[elec[0]]->Pz(),v[elec[0]]->E());
+      v_elec2.SetPxPyPzE(v[elec[1]]->Px(),v[elec[1]]->Py(),v[elec[1]]->Pz(),v[elec[1]]->E());
 
-        }
+      v_elec_nu1.SetPxPyPzE(v[elec_nu[0]]->Px(),v[elec_nu[0]]->Py(),v[elec_nu[0]]->Pz(),v[elec_nu[0]]->E());
+      v_elec_nu2.SetPxPyPzE(v[elec_nu[1]]->Px(),v[elec_nu[1]]->Py(),v[elec_nu[1]]->Pz(),v[elec_nu[1]]->E());
+
+        v_w_boson3 = v_elec1 + v_elec_nu1;
+        v_w_boson4 = v_elec2 + v_elec_nu2;
+TLorentzVector v_wbosons[4]={v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4};
+	for (int wb=0; wb<4 ; wb++) {
+        hPt_wboson[wb]->Fill( v_wbosons[wb].Pt() );
+        hEta_wboson[wb]->Fill( v_wbosons[wb].Eta() );
+        hPhi_wboson[wb]->Fill( v_wbosons[wb].Phi() );
+        hM_wboson[wb]->Fill( v_wbosons[wb].M() );
+    }
+	// top quark kinematics
+	v_top1 = v_w_boson1+v_bquark1;
+	v_top2 = v_w_boson2+v_bquark2;
+	v_top3 = v_w_boson3+v_bquark3;
+	v_top4 = v_w_boson4+v_bquark4;
+
+}
+
 if (n_muon==1){
 double muon_pt[4] = {v[muon[0]]->Pt()};	
         std::sort(muon_pt,muon_pt+1);
@@ -469,6 +584,11 @@ double muon_phi[4] = {v[muon[0]]->Phi()};
           hEta_mu[n_m]->Fill( muon_eta[n_m] );
           hPhi_mu[n_m]->Fill( muon_phi[n_m] );
           }
+      v_muon1.SetPxPyPzE(v[muon[0]]->Px(),v[muon[0]]->Py(),v[muon[0]]->Pz(),v[muon[0]]->E());
+      v_mu_nu1.SetPxPyPzE(v[mu_nu[0]]->Px(),v[mu_nu[0]]->Py(),v[mu_nu[0]]->Pz(),v[mu_nu[0]]->E());
+  	//  w boson lorentz vectors
+        v_w_boson1 = v_muon1+v_mu_nu1;
+
 
 double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt(),v[elec[2]]->Pt()};	
         std::sort(elec_pt,elec_pt+3);
@@ -477,8 +597,31 @@ double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta(),v[elec[2]]->Eta()};
 double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi(),v[elec[2]]->Phi()};	
         std::sort(elec_phi,elec_phi+3);
 
-	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<",  "<<elec_pt[2]<<",  "<<endl;
-	}
+      v_elec1.SetPxPyPzE(v[elec[0]]->Px(),v[elec[0]]->Py(),v[elec[0]]->Pz(),v[elec[0]]->E());
+      v_elec2.SetPxPyPzE(v[elec[1]]->Px(),v[elec[1]]->Py(),v[elec[1]]->Pz(),v[elec[1]]->E());
+      v_elec3.SetPxPyPzE(v[elec[2]]->Px(),v[elec[2]]->Py(),v[elec[2]]->Pz(),v[elec[2]]->E());
+
+      v_elec_nu1.SetPxPyPzE(v[elec_nu[0]]->Px(),v[elec_nu[0]]->Py(),v[elec_nu[0]]->Pz(),v[elec_nu[0]]->E());
+      v_elec_nu2.SetPxPyPzE(v[elec_nu[1]]->Px(),v[elec_nu[1]]->Py(),v[elec_nu[1]]->Pz(),v[elec_nu[1]]->E());
+      v_elec_nu3.SetPxPyPzE(v[elec_nu[2]]->Px(),v[elec_nu[2]]->Py(),v[elec_nu[2]]->Pz(),v[elec_nu[2]]->E());
+
+        v_w_boson2 = v_elec1 + v_elec_nu1;
+        v_w_boson3 = v_elec2 + v_elec_nu2;
+        v_w_boson4 = v_elec3 + v_elec_nu3;
+TLorentzVector v_wbosons[4]={v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4};
+	for (int wb=0; wb<4 ; wb++) {
+        hPt_wboson[wb]->Fill( v_wbosons[wb].Pt() );
+        hEta_wboson[wb]->Fill( v_wbosons[wb].Eta() );
+        hPhi_wboson[wb]->Fill( v_wbosons[wb].Phi() );
+        hM_wboson[wb]->Fill( v_wbosons[wb].M() );
+    }
+	// top quark kinematics
+	v_top1 = v_w_boson1+v_bquark1;
+	v_top2 = v_w_boson2+v_bquark2;
+	v_top3 = v_w_boson3+v_bquark3;
+	v_top4 = v_w_boson4+v_bquark4;
+
+}
 
 if (n_elec==4){
 double elec_pt[4] = {v[elec[0]]->Pt(),v[elec[1]]->Pt(),v[elec[2]]->Pt(),v[elec[3]]->Pt()};	
@@ -487,9 +630,43 @@ double elec_eta[4] = {v[elec[0]]->Eta(),v[elec[1]]->Eta(),v[elec[2]]->Eta(),v[el
         std::sort(elec_eta,elec_eta+4);
 double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi(),v[elec[2]]->Phi(),v[elec[3]]->Phi()};	
         std::sort(elec_phi,elec_phi+4);
+      v_elec1.SetPxPyPzE(v[elec[0]]->Px(),v[elec[0]]->Py(),v[elec[0]]->Pz(),v[elec[0]]->E());
+      v_elec2.SetPxPyPzE(v[elec[1]]->Px(),v[elec[1]]->Py(),v[elec[1]]->Pz(),v[elec[1]]->E());
+      v_elec3.SetPxPyPzE(v[elec[2]]->Px(),v[elec[2]]->Py(),v[elec[2]]->Pz(),v[elec[2]]->E());
+      v_elec4.SetPxPyPzE(v[elec[3]]->Px(),v[elec[3]]->Py(),v[elec[3]]->Pz(),v[elec[3]]->E());
 
-	cout<<"elec_pt :  "<<elec_pt[0]<<",  "<<elec_pt[1]<<",  "<<elec_pt[2]<<",  "<<elec_pt[3]<<",  "<<endl;
-	}
+      v_elec_nu1.SetPxPyPzE(v[elec_nu[0]]->Px(),v[elec_nu[0]]->Py(),v[elec_nu[0]]->Pz(),v[elec_nu[0]]->E());
+      v_elec_nu2.SetPxPyPzE(v[elec_nu[1]]->Px(),v[elec_nu[1]]->Py(),v[elec_nu[1]]->Pz(),v[elec_nu[1]]->E());
+      v_elec_nu3.SetPxPyPzE(v[elec_nu[2]]->Px(),v[elec_nu[2]]->Py(),v[elec_nu[2]]->Pz(),v[elec_nu[2]]->E());
+      v_elec_nu4.SetPxPyPzE(v[elec_nu[3]]->Px(),v[elec_nu[3]]->Py(),v[elec_nu[3]]->Pz(),v[elec_nu[3]]->E());
+
+        v_w_boson1 = v_elec1 + v_elec_nu1;
+        v_w_boson2 = v_elec2 + v_elec_nu2;
+        v_w_boson3 = v_elec3 + v_elec_nu3;
+        v_w_boson4 = v_elec4 + v_elec_nu4;
+TLorentzVector v_wbosons[4]={v_w_boson1, v_w_boson2, v_w_boson3, v_w_boson4};
+	for (int wb=0; wb<4 ; wb++) {
+        hPt_wboson[wb]->Fill( v_wbosons[wb].Pt() );
+        hEta_wboson[wb]->Fill( v_wbosons[wb].Eta() );
+        hPhi_wboson[wb]->Fill( v_wbosons[wb].Phi() );
+        hM_wboson[wb]->Fill( v_wbosons[wb].M() );
+    }
+	// top quark kinematics
+	v_top1 = v_w_boson1+v_bquark1;
+	v_top2 = v_w_boson2+v_bquark2;
+	v_top3 = v_w_boson3+v_bquark3;
+	v_top4 = v_w_boson4+v_bquark4;
+cout<<"this is top quark mass:  "<<v_top4.M()<<endl;
+}
+cout<<"this is outside top quark mass:  "<<v_top4.M()<<endl;
+
+TLorentzVector v_tops[4]={v_top1, v_top2, v_top3, v_top4};
+	for (int t=0; t<4 ; t++) {
+        hPt_top[t]->Fill( v_tops[t].Pt() );
+        hEta_top[t]->Fill( v_tops[t].Eta() );
+        hPhi_top[t]->Fill( v_tops[t].Phi() );
+        hM_top[t]->Fill( v_tops[t].M() );
+    }
 
 // sort the quarks
       int nquarks=0;
@@ -503,7 +680,13 @@ double elec_phi[4] = {v[elec[0]]->Phi(),v[elec[1]]->Phi(),v[elec[2]]->Phi(),v[el
         hEta_q[nq]->Fill( v[q[nq]]->Eta() );
         hPhi_q[nq]->Fill( v[q[nq]]->Phi() );
       }
-
+      // wbosons kinematics
+/*      for (int wb=0; wb<4 ; wb++) {
+        hPt_q[nq]->Fill( v[q[wb]]->Pt() );
+        hEta_q[nq]->Fill( v[q[]]->Eta() );
+        hPhi_q[nq]->Fill( v[q[nq]]->Phi() );
+      }
+*/
 // --- end filling the histograms
       ff>>tt;
       line++;
@@ -632,6 +815,19 @@ c1->SaveAs("hE.pdf");
     hEta_mu[i]->Write();
     hPhi_mu[i]->Write();
   }
+    for (int i=0;i<4;i++) {
+    hPt_wboson[i]->Write();
+    hEta_wboson[i]->Write();
+    hPhi_wboson[i]->Write();
+    hM_wboson[i]->Write();
+  }
+    for (int i=0;i<4;i++) {
+    hPt_top[i]->Write();
+    hEta_top[i]->Write();
+    hPhi_top[i]->Write();
+    hM_top[i]->Write();
+  }
+
 /*  hextrajet_flavour->Write();
   hPt_extrajet->Write();
   hEta_extrajet->Write();
