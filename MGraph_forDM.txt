@@ -40,7 +40,7 @@ include path to the library path from the path/to/HEPTools/lhapdf6_py3/
 Now run MGraph:
 For mono-higgs signature:
 
->> python3.8 ./bin/mg5_aMC
+>> ./bin/mg5_aMC
 For gluon-gluon fusion:
 >> import model Pseudoscalar_2HDM
 >> generate g g > h1 xd xd~ [noborn=QCD]
