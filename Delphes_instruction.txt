@@ -5,3 +5,10 @@ While running delphes, solution for the following error is:
 Error in cling::AutoLoadingVisitor::InsertIntoAutoLoadingState:
    Missing FileEntry for modules/ClusterCounting.h
  >> export ROOT_INCLUDE_PATH=/afs/cern.ch/work/m/mgul/public/dark_matter/phenom/MG5_aMC_v3_4_0/Delphes/
+
+Error.
+** ERROR: invalid vertex format
+** [################################################################] (100.00%)
+** Exiting...
+Solution: https://answers.launchpad.net/mg5amcnlo/+question/816055
+Work with HEPMC2 instead of MEPMC3
