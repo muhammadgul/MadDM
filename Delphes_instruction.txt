@@ -1,6 +1,11 @@
 To install the Delphes follow the instructions on page below.
 https://cp3.irmp.ucl.ac.be/projects/delphes/wiki/WorkBook/QuickTour
 
+> How to anlyze delphes output:
+>> In Delphes directory, within examples directory, download the Example1.py and definition.py files.
+   and run using the following command.
+python examples/Example1.py ../../../delphes_files/template_2hdm_a_pp_4top_SM_4t_4b_4l_4nu_new1/tag_1_delphes_events.root
+
 While running delphes, solution for the following error is:
 Error in cling::AutoLoadingVisitor::InsertIntoAutoLoadingState:
    Missing FileEntry for modules/ClusterCounting.h
