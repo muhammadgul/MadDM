@@ -4,19 +4,13 @@ import math
 import sys
 import time
 import ROOT
+import numpy as np
 from array import array
 
-def delta_phi(phi1, phi2):
-    dphi = phi2 - phi1
-    if abs(dphi) > math.pi:
-        dphi = 2 * math.pi - abs(dphi)
-    return dphi
-
-def delta_r(eta1, eta2, phi1, phi2):
-    deta = eta2 - eta1
-    dphi = delta_phi(phi1, phi2)  # Reuse delta_phi function
-    delta_r_value = math.sqrt(dphi**2 + deta**2)
-    return delta_r_value
+from definitions import delta_phi, delta_r, calculate_event_shape, define_histograms, define_tree, calculate_fox_wolfram
+# Initialize histograms and tree
+histograms = define_histograms()
+my_tree, branches = define_tree()
 
 try:
   input = raw_input
@@ -47,7 +41,6 @@ chain.Add(inputFile)
 treeReader = ROOT.ExRootTreeReader(chain)
 numberOfEntries = treeReader.GetEntries()
 #numberOfEntries = 4
-
 # Get pointers to branches used in this analysis
 branchWeight   = treeReader.UseBranch("Weight")
 branchEvent    = treeReader.UseBranch("Event")
@@ -57,38 +50,20 @@ branchMuon = treeReader.UseBranch("Muon")
 branchScalarHT = treeReader.UseBranch("ScalarHT")
 branchMET = treeReader.UseBranch("MissingET")
 
-#creating a tree
-my_tree = ROOT.TTree("my_Tree", "Tree with multiple branches")
-n_bjets = 4
-bjet_pt = [array('f', [0.]) for _ in range(n_bjets)]  # Array to hold PT values of 4 jets
 
-# Create branches dynamically using a loop for bjets
-bjets_size = array('i', [0])
-jets_size = array('i', [0])
-MET_ = array('f', [0.])
-SHT = array('f', [0.])
-for i in range(n_bjets):
-    my_tree.Branch(f"bjet{i+1}_pt", bjet_pt[i], f"bjet{i+1}_pt/F")
-
-my_tree.Branch("bjet_size",bjets_size, "bjet_size/I")
-my_tree.Branch("jet_size",jets_size, "jet_size/I")
-my_tree.Branch("MET",MET_, "MET/F")
-my_tree.Branch("SHT",SHT, "SHT/F")
-
-
-n_leps = 4
-lep_pt = [array('f', [0.]) for _ in range(n_leps)]  # Array to hold PT values of 4 jets
+#n_leps = 4
+#lep_pt_br = [array('f', [0.]) for _ in range(n_leps)]  # Array to hold PT values of 4 leptons for lepton branch
 
 # Create branches dynamically using a loop for leptons
-for i in range(n_leps):
-    my_tree.Branch(f"lep{i+1}_pt", lep_pt[i], f"lep{i+1}_pt/F")
+#for i in range(n_leps):
+#    my_tree.Branch(f"lep{i+1}_pt", lep_pt_br[i], f"lep{i+1}_pt/F")
 
 # Book histograms
-histJetsSize = ROOT.TH1F("jet_Size", "jet Size", 18, 0.0, 17.0)
+#########histJetsSize = ROOT.TH1F("jet_Size", "jet Size", 18, 0.0, 17.0)
 
-histbJetsSize = ROOT.TH1F("bjets_Size", "bjets Size", 17, 0.0, 17.0)
-histScalarHT = ROOT.TH1F("Scalar_HT", "Scalar HT", 100, 100.0, 1800.0)
-histMET = ROOT.TH1F("MET", "MET", 100, 0.0, 600.0)
+#histbJetsSize = ROOT.TH1F("bjets_Size", "bjets Size", 17, 0.0, 17.0)
+#histScalarHT = ROOT.TH1F("Scalar_HT", "Scalar HT", 100, 100.0, 1800.0)
+#histMET = ROOT.TH1F("MET", "MET", 100, 0.0, 600.0)
 bjets_hPt_l = []
 bjets_hEta_l = []
 bjets_hPhi_l = []
@@ -138,6 +113,7 @@ for i in range (4):
 
 # Loop over all events
 for entry in range(0, numberOfEntries):
+#for entry in range(0, 2):
   if (entry+1)%100 == 0:
     print (' ... processed {} events ...'.format(entry+1))
 
@@ -148,17 +124,24 @@ for entry in range(0, numberOfEntries):
   ## main MC event weight
   w =  branchEvent[0].Weight
   for met in range(0,branchMET.GetEntries()):
-    histMET.Fill(branchMET.At(met).MET,w)
-    MET_[0] = branchMET.At(met).MET
+    histograms["histMET"].Fill(branchMET.At(met).MET,w)
+    branches["MET_"][0] = branchMET.At(met).MET
   for sHT in range(0,branchScalarHT.GetEntries()):
-    histScalarHT.Fill(branchScalarHT.At(sHT).HT,w)
-    SHT[0] = branchScalarHT.At(sHT).HT
+    histograms["histScalarHT"].Fill(branchScalarHT.At(sHT).HT,w)
+    branches["SHT"][0] = branchScalarHT.At(sHT).HT
 
   # If event contains at least 4 jet
-  histJetsSize.Fill(branchJet.GetEntries(), w)
-  jets_size[0] = branchJet.GetEntries()
+  histograms["histJetsSize"].Fill(branchJet.GetEntries(), w)
+  branches["jets_size"][0] = branchJet.GetEntries()
   my_tree.Fill()
   if branchJet.GetEntries() > 3:
+    momentum_vectors_jets = [[branchJet.At(jet).P4().Px(), branchJet.At(jet).P4().Py(), branchJet.At(jet).P4().Pz()] for jet in range (0, branchJet.GetEntries())]
+    sphericity, aplanarity, circularity = calculate_event_shape(momentum_vectors_jets)
+    branches["sphericity_jets"][0] = sphericity
+    branches["aplanarity_jets"][0] = aplanarity
+    branches["circularity_jets"][0] = circularity
+
+#    branches["sphericity_jets"][0], branches["aplanarity_jets"][0], branches["circularity_jets"][0] = calculate_event_shape(momentum_vectors_jets)
 
     ## 0 - Loose , 1 - Medium, 2 - Tight
     wp = 1
@@ -175,23 +158,34 @@ for entry in range(0, numberOfEntries):
     # Plot bjets transverse momentum
         if (BtagOk and pt > 30. and eta < 5.):
             bjets_list.append(branchJet.At(bj))
-    histbJetsSize.Fill(len(bjets_list), w)
-    bjets_size[0] = len(bjets_list)
+    histograms["histbJetsSize"].Fill(len(bjets_list), w)
+    branches["bjets_size"][0] = len(bjets_list)
 #    my_tree.Fill()
     print("Jets no: ",branchJet.GetEntries())
     if len(bjets_list) > 3:
+        momentum_vectors_bjets = [[bjet.P4().Px(), bjet.P4().Py(), bjet.P4().Pz()] for bjet in bjets_list]
+        sphericity, aplanarity, circularity = calculate_event_shape(momentum_vectors_bjets)
+        branches["sphericity_bjets"][0] = sphericity
+        branches["aplanarity_bjets"][0] = aplanarity
+        # Compute Fox-Wolfram Moments
+        max_order = 4
+        bjets_fox_wolfram_moments = calculate_fox_wolfram(momentum_vectors_bjets, max_order=max_order)
+
+    # Update Fox-Wolfram branches
+        for l, moment in enumerate(bjets_fox_wolfram_moments):
+            branches[f"bjets_fox_wolfram_H{l}"][0] = moment
         for hist in bjets_hPt_l:
             idx = bjets_hPt_l.index(hist)
             hist.Fill(branchJet.At(idx).PT, w)
 # Fill Branch of tree
-            bjet_pt[i][0] = -999.0
-            bjet_pt[idx][0] = branchJet.At(idx).PT
+            #bjet_pt_br[idx][0] = branchJet.At(idx).PT
+            branches[f"bjet{idx+1}_pt_br"][0] = branchJet.At(idx).PT
 #        my_tree.Fill()   
 
         for hist in bjets_hEta_l:
             idx = bjets_hEta_l.index(hist)
             hist.Fill(branchJet.At(idx).Eta, w)
-
+        bj_pair_count = 0
         for idx, hist in enumerate(bjets_hPhi_l):
 #            idx = bjets_hPhi_l.index(hist)
             print("bjets index in phi loop: ", idx);
@@ -199,10 +193,13 @@ for entry in range(0, numberOfEntries):
             for idx2 in range(idx+1, len(bjets_hPhi_l)):
                 dphi = delta_phi(branchJet.At(idx).Phi, branchJet.At(idx2).Phi)
                 dphi_values.append(dphi)
+                branches[f"bjet_dphi_br{idx}_{idx2}"][0] = dphi
                 print("idx1: ", idx,",  idx2: ", idx2, ",  dPhi:  ",dphi)
                 dR = delta_r(branchJet.At(idx).Eta, branchJet.At(idx2).Eta, branchJet.At(idx).Phi, branchJet.At(idx2).Phi)
                 dR_values.append(dR)
+                branches[f"bjet_dr_br{idx}_{idx2}"][0] = dR
                 print("deta R:  ", dR)
+                bj_pair_count += 1
         for idx_dphi, (hist_dphi, dphi_val) in enumerate(zip(bjets_hdPhi_l, dphi_values)):
                 hist_dphi.Fill(dphi_val, w)
 
@@ -224,11 +221,23 @@ for entry in range(0, numberOfEntries):
         for m in range(0,branchMuon.GetEntries()):
             leptons_list.append(branchMuon.At(m))
         leptons_list.sort()
+        momentum_vectors_lep = [[lep.P4().Px(), lep.P4().Py(), lep.P4().Pz()] for lep in leptons_list]
+        sphericity, aplanarity, circularity = calculate_event_shape(momentum_vectors_jets)
+        branches["sphericity_leps"][0] = sphericity
+        branches["aplanarity_leps"][0] = aplanarity
+    # Compute Fox-Wolfram Moments
+        max_order = 4
+        leps_fox_wolfram_moments = calculate_fox_wolfram(momentum_vectors_lep, max_order=max_order)
+
+    # Update Fox-Wolfram branches
+        for l, moment in enumerate(leps_fox_wolfram_moments):
+            branches[f"leps_fox_wolfram_H{l}"][0] = moment
+
         for lep in lep_hPt_l:
             idx = lep_hPt_l.index(lep)
             lep.Fill(leptons_list[idx].PT, w)
 # Fill leptons brach
-            lep_pt[idx][0] = leptons_list[idx].PT
+            branches[f"lep{idx}_pt_br"][0] = leptons_list[idx].PT
 #        my_tree.Fill()
         for lep in lep_hEta_l:
             idx = lep_hEta_l.index(lep)
@@ -241,8 +250,10 @@ for entry in range(0, numberOfEntries):
 #      print ("lepton index: ", idx)
 #    print("Electron no: ",branchElectron.GetEntries())
 #    print("Muon no: ",branchMuon.GetEntries())
-#  for i in bjets_list:
-#    print ("bjets pt: ", i.PT)
+    if len(bjets_list) >= 2 and len(leptons_list) >= 2:
+        for i in range(2):
+            branches["br_dphi_bjet_lep_leading"][i][0] = delta_phi(bjets_list[i].Phi, leptons_list[i].Phi)
+            branches["br_dr_bjet_lep_leading"][i][0] = delta_r(bjets_list[i].Eta, leptons_list[i].Eta, bjets_list[i].Phi, leptons_list[i].Phi)
 
     # Plot their invariant mass
  #   histMass.Fill(((elec1.P4()) + (elec2.P4())).M())
@@ -251,6 +262,8 @@ for entry in range(0, numberOfEntries):
 #my_tree.Fill()
 my_tree.Write()
 # Write the histograms to the ROOT file
+for hist in histograms.values():
+    hist.Write()
 file.Write()
 
 # Close the file
