@@ -1,3 +1,6 @@
+# Miniconda Installation with root environment
+https://iscinumpy.gitlab.io/post/root-conda/
+
 # MadGraph for Dark Matter
 >> mkdir madgraph
 
